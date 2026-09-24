@@ -160,7 +160,9 @@ BEGIN
   FROM public.profiles WHERE id = v_uid;
 
   INSERT INTO public.teams (name, leader_id) VALUES (v_name, v_uid) RETURNING id INTO v_team_id;
-  INSERT INTO public.team_members (team_id, user_id, role) VALUES (v_team_id, v_uid, 'leader');
+  -- Creator starts as 'member'; role is promoted to 'leader' only when they
+  -- send their first invitation (see send_team_invitation below).
+  INSERT INTO public.team_members (team_id, user_id, role) VALUES (v_team_id, v_uid, 'member');
 
   RETURN v_team_id;
 END;
@@ -311,7 +313,6 @@ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 DECLARE
   v_uid UUID := auth.uid();
   v_team_id UUID;
-  v_role TEXT;
   v_member_count INTEGER;
   v_last_sent TIMESTAMPTZ;
   v_invitation_id UUID;
@@ -325,15 +326,22 @@ BEGIN
     RAISE EXCEPTION 'CANNOT_INVITE_SELF';
   END IF;
 
-  SELECT team_id, role INTO v_team_id, v_role FROM public.team_members WHERE user_id = v_uid;
+  SELECT team_id INTO v_team_id FROM public.team_members WHERE user_id = v_uid;
 
   IF v_team_id IS NULL THEN
     RAISE EXCEPTION 'NO_TEAM';
   END IF;
 
-  IF v_role <> 'leader' THEN
+  -- Leadership is determined by teams.leader_id, not team_members.role.
+  -- This allows the creator (whose role starts as 'member') to send their
+  -- first invitation. On that first send, they are promoted to 'leader'.
+  IF NOT EXISTS (SELECT 1 FROM public.teams WHERE id = v_team_id AND leader_id = v_uid) THEN
     RAISE EXCEPTION 'NOT_LEADER';
   END IF;
+
+  -- Promote to 'leader' role on first invitation sent.
+  UPDATE public.team_members SET role = 'leader'
+  WHERE team_id = v_team_id AND user_id = v_uid AND role <> 'leader';
 
   IF NOT EXISTS (SELECT 1 FROM public.profiles WHERE id = p_recipient_id AND role = 'participant') THEN
     RAISE EXCEPTION 'RECIPIENT_NOT_FOUND';
