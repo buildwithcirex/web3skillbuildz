@@ -39,6 +39,13 @@ export function useTeamNotifications(userId: string) {
   // sense as a one-off, gesture-triggered action) — we just hide the
   // prompt once the user has responded to it.
   const [promptDismissed, setPromptDismissed] = useState(false)
+  // Always false on first render to match the server; updated after mount.
+  const [showPrompt, setShowPrompt] = useState(false)
+
+  useEffect(() => {
+    const supported = typeof window !== 'undefined' && 'Notification' in window
+    setShowPrompt(supported && !promptDismissed && Notification.permission === 'default')
+  }, [promptDismissed])
 
   useEffect(() => {
     if (!userId) return
@@ -66,9 +73,6 @@ export function useTeamNotifications(userId: string) {
     await Notification.requestPermission()
     setPromptDismissed(true)
   }
-
-  const supported = typeof window !== 'undefined' && 'Notification' in window
-  const showPrompt = supported && !promptDismissed && Notification.permission === 'default'
 
   return { showPrompt, requestPermission }
 }
