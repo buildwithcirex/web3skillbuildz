@@ -8,8 +8,8 @@ Whenever a new chat session begins, read this file first to understand the curre
 
 ## 📅 Project Status Overview
 - **Current Phase:** Phase 6 — Final Polish & Deployment Prep
-- **Last Updated:** 2026-09-24T03:44:00+05:30
-- **Current Blocker/Notes:** Implemented complete user erasure on deletion: when an admin deletes a participant, their uploaded screenshots are removed from the `project_screenshots` Supabase storage bucket, and their account is purged completely from `auth.users` via `delete_user_completely` RPC (which cascades and deletes all profile rows, sessions, and identities). Handled fallback to direct profile deletion. Production build passes cleanly.
+- **Last Updated:** 2026-09-24T19:00:00+05:30
+- **Current Blocker/Notes:** Split participant dashboard into a home page (`/dashboard`) and a dedicated submission page (`/dashboard/submit`). Extracted `DashboardNav` as a shared component with active-tab highlighting. "Submission" nav button now routes to `/dashboard/submit`; "Result" nav button routes to `/dashboard/results` (page TBD). Production build passes cleanly.
 
 ---
 
@@ -45,6 +45,8 @@ Whenever a new chat session begins, read this file first to understand the curre
 - [x] Fix admin authorization checking in Server Actions with `checkIsAdmin` helper.
 - [x] Implement complete user and asset erasure on delete (Storage cleanup + `auth.users` purge cascading to `profiles` and auth sessions).
 - [x] Integrate Agentation visual feedback toolbar.
+- [x] Added navigation bar elements to Participant Dashboard (Search Bar, Submission, Result buttons) and widened layout to `max-w-5xl`.
+- [x] Split dashboard into home page (`/dashboard`) and submission page (`/dashboard/submit`); extracted `DashboardNav` shared component.
 - [x] **Production build passes with zero errors.**
 - [x] Create `src/lib/supabase/server.ts` — server-side Supabase client using `@supabase/ssr`.
 - [x] Create `src/lib/supabase/client.ts` — browser-side Supabase client.
