@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { signOut } from '@/app/actions/auth'
 import ParticipantSubmissionSection from './_components/ParticipantSubmissionSection'
+import TeamBuilderSection from './_components/TeamBuilderSection'
+import { getTeamOverview } from '@/app/actions/team'
 import type { Profile } from '@/lib/types'
 
 export default async function DashboardPage() {
@@ -60,6 +62,7 @@ export default async function DashboardPage() {
   const isLocked = Boolean(config?.submissions_locked)
   const isScoresPublished = Boolean(config?.scores_published)
   const hasSubmitted = !!(profile.project_description && profile.deploy_link && profile.screenshot_url)
+  const teamOverview = await getTeamOverview()
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -127,6 +130,9 @@ export default async function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Submission Section */}
+        <TeamBuilderSection overview={teamOverview} />
 
         {/* Submission Section */}
         <ParticipantSubmissionSection

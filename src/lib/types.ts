@@ -20,3 +20,31 @@ export interface EventConfig {
   scores_published?: boolean
   updated_at?: string
 }
+
+export type TeamRequestStatus = 'pending' | 'accepted' | 'declined'
+
+export interface TeamMemberSummary {
+  id: string
+  name: string
+  email: string
+}
+
+export interface TeamIncomingRequest {
+  id: string
+  senderId: string
+  senderName: string
+  senderEmail: string
+  createdAt: string
+}
+
+export interface TeamOverview {
+  error: string | null
+  canManageTeam: boolean
+  isTeamFull: boolean
+  teamLeaderId: string | null
+  teamMembers: TeamMemberSummary[]
+  participants: TeamMemberSummary[]
+  incomingRequests: TeamIncomingRequest[]
+  outgoingRequestStatusByRecipient: Record<string, 'Request Sent' | 'Accepted' | 'Declined'>
+  sameTeamMemberIds: string[]
+}
