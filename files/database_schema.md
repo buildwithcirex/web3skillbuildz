@@ -10,12 +10,27 @@ CREATE TABLE public.profiles (
   email TEXT NOT NULL,
   phone TEXT NOT NULL,
   role TEXT DEFAULT 'participant' CHECK (role IN ('participant', 'admin')),
+  team_id UUID REFERENCES public.teams(id) ON DELETE SET NULL,
   project_description TEXT,
   deploy_link TEXT,
   screenshot_url TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 ```
+
+## 1a. Teams Table
+Holds team definitions. Participants are assigned to a team via `profiles.team_id`.
+The "create team" feature (built separately) populates this table and sets `team_id` on profiles.
+
+```sql
+CREATE TABLE public.teams (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+> **Note:** Create the `teams` table BEFORE adding `team_id` to `profiles` so the foreign key resolves.
 
 ## 2. Storage Bucket
 - **Name:** `project_screenshots`

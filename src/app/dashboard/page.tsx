@@ -1,8 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { signOut } from '@/app/actions/auth'
-import ParticipantSubmissionSection from './_components/ParticipantSubmissionSection'
-import type { Profile } from '@/lib/types'
+import Link from 'next/link'
+import DashboardNav from './_components/DashboardNav'
+import type { Profile, Team } from '@/lib/types'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -10,7 +11,6 @@ export default async function DashboardPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/')
 
-  // Try to fetch existing profile
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('*')
@@ -21,7 +21,6 @@ export default async function DashboardPage() {
     console.error('Error fetching profile:', profileError)
   }
 
-  // If profile still missing, show friendly error with details
   if (!profile) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
@@ -47,10 +46,8 @@ export default async function DashboardPage() {
     )
   }
 
-  // Role guard — admins go to /admin
   if (profile.role === 'admin') redirect('/admin')
 
-  // Check event submissions lock status & scores published status
   const { data: config } = await supabase
     .from('event_config')
     .select('submissions_locked, scores_published')
@@ -61,79 +58,100 @@ export default async function DashboardPage() {
   const isScoresPublished = Boolean(config?.scores_published)
   const hasSubmitted = !!(profile.project_description && profile.deploy_link && profile.screenshot_url)
 
+  // Fetch team data if the participant belongs to a team
+  let team: Team | null = null
+  let teamMembers: Pick<Profile, 'id' | 'name' | 'email' | 'phone'>[] = []
+
+  if (profile.team_id) {
+    const [{ data: teamData }, { data: members }] = await Promise.all([
+      supabase.from('teams').select('*').eq('id', profile.team_id).maybeSingle<Team>(),
+      supabase
+        .from('profiles')
+        .select('id, name, email, phone')
+        .eq('team_id', profile.team_id)
+        .neq('id', profile.id),
+    ])
+    team = teamData
+    teamMembers = (members as Pick<Profile, 'id' | 'name' | 'email' | 'phone'>[] | null) ?? []
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Nav */}
-      <header className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
-              </div>
-              <span className="font-bold text-gray-900 hidden sm:block">SkillBuildz</span>
-            </div>
-            
-            {/* New Navigation Links */}
-            <nav className="flex items-center gap-2 border-l border-gray-200 pl-6">
-              <button className="text-sm font-medium text-gray-600 hover:text-indigo-600 transition px-3 py-1.5 rounded-lg hover:bg-indigo-50">
-                Submission
-              </button>
-              <button className="text-sm font-medium text-gray-600 hover:text-indigo-600 transition px-3 py-1.5 rounded-lg hover:bg-indigo-50">
-                Result
-              </button>
-            </nav>
-          </div>
+      <DashboardNav profileName={profile.name} activeTab="home" />
 
-          <div className="flex items-center gap-4">
-            {/* New Search Bar */}
-            <div className="relative hidden md:block">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-              <input
-                type="text"
-                placeholder="Search..."
-                className="block w-full pl-10 pr-3 py-1.5 border border-gray-300 rounded-lg text-sm placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-50 transition-colors"
-              />
-            </div>
-
-            <span className="text-sm text-gray-500 hidden lg:block border-l border-gray-200 pl-4">
-              Welcome, <span className="font-medium text-gray-900">{profile.name}</span>
-            </span>
-            <form action={signOut}>
-              <button
-                type="submit"
-                className="text-sm font-medium text-gray-600 hover:text-red-600 transition px-3 py-1.5 rounded-lg hover:bg-red-50"
-              >
-                Sign Out
-              </button>
-            </form>
-          </div>
-        </div>
-      </header>
-
-      {/* Main content */}
       <main className="max-w-5xl mx-auto px-6 py-10 space-y-8">
-        <div className="flex items-center gap-3">
-          <h2 className="text-2xl font-bold text-gray-900">My Dashboard</h2>
-          {hasSubmitted ? (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">
-              ✓ Submitted
-            </span>
-          ) : isLocked ? (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">
-              🔒 Submissions Closed
-            </span>
-          ) : (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
-              Pending Submission
-            </span>
-          )}
+        {/* Welcome Banner */}
+        <div className="bg-gradient-to-r from-indigo-600 to-indigo-500 rounded-2xl p-8 text-white">
+          <p className="text-indigo-200 text-sm font-medium mb-1">Welcome back</p>
+          <h1 className="text-3xl font-bold mb-2">{profile.name}</h1>
+          <p className="text-indigo-100 text-sm">
+            {hasSubmitted
+              ? "Your project has been submitted. Check back here for results."
+              : isLocked
+              ? "Submissions are currently closed. Stay tuned for updates."
+              : "You haven't submitted your project yet. Head over to the Submission page to get started."}
+          </p>
+        </div>
+
+        {/* Status + Actions Row */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {/* Submission Status */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Submission Status</p>
+            {hasSubmitted ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-green-100 text-green-800 w-fit">
+                <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
+                Submitted
+              </span>
+            ) : isLocked ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-amber-100 text-amber-800 w-fit">
+                <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
+                Closed
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800 w-fit">
+                <span className="w-2 h-2 rounded-full bg-yellow-500 inline-block" />
+                Pending
+              </span>
+            )}
+            <Link
+              href="/dashboard/submit"
+              className="mt-auto text-sm font-medium text-indigo-600 hover:text-indigo-700 transition"
+            >
+              {hasSubmitted ? 'View / Edit →' : isLocked ? 'View details →' : 'Submit now →'}
+            </Link>
+          </div>
+
+          {/* Results Status */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Results</p>
+            {isScoresPublished ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-blue-100 text-blue-800 w-fit">
+                <span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />
+                Published
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-gray-100 text-gray-600 w-fit">
+                <span className="w-2 h-2 rounded-full bg-gray-400 inline-block" />
+                Not yet
+              </span>
+            )}
+            <Link
+              href="/dashboard/results"
+              className="mt-auto text-sm font-medium text-indigo-600 hover:text-indigo-700 transition"
+            >
+              View results →
+            </Link>
+          </div>
+
+          {/* Event Info */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Event</p>
+            <p className="text-sm font-semibold text-gray-900">SkillBuildz Hackathon</p>
+            <p className="text-xs text-gray-400">
+              {isLocked ? 'Submissions have closed.' : 'Submissions are open.'}
+            </p>
+          </div>
         </div>
 
         {/* Profile Card */}
@@ -155,14 +173,68 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Submission Section */}
-        <ParticipantSubmissionSection
-          profile={profile}
-          isLocked={isLocked}
-          isScoresPublished={isScoresPublished}
-        />
+        {/* Team Section */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">My Team</h3>
+            {team && (
+              <span className="text-xs font-medium text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full">
+                {team.name}
+              </span>
+            )}
+          </div>
+
+          {!profile.team_id ? (
+            <div className="flex flex-col items-center justify-center py-8 text-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-700">You're not in a team yet</p>
+                <p className="text-xs text-gray-400 mt-1">Join or create a team to collaborate with others.</p>
+              </div>
+              <button
+                type="button"
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl transition"
+              >
+                Create Team
+              </button>
+            </div>
+          ) : teamMembers.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-8 text-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-700">You're the only one here</p>
+                <p className="text-xs text-gray-400 mt-1">No other members have joined your team yet.</p>
+              </div>
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-50">
+              {teamMembers.map((member) => (
+                <div key={member.id} className="flex items-center gap-4 py-3 first:pt-0 last:pb-0">
+                  <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
+                    <span className="text-sm font-semibold text-indigo-600">
+                      {member.name.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">{member.name}</p>
+                    <p className="text-xs text-gray-400 truncate">{member.email}</p>
+                  </div>
+                  <span className="ml-auto text-xs text-gray-400 shrink-0">{member.phone}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
       </main>
     </div>
   )
 }
-
