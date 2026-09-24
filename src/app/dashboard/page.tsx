@@ -2,7 +2,9 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { signOut } from '@/app/actions/auth'
 import ParticipantSubmissionSection from './_components/ParticipantSubmissionSection'
+import TeamSection from './_components/team/TeamSection'
 import type { Profile } from '@/lib/types'
+import type { MyInvitations, Team } from '@/lib/team/types'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -60,6 +62,12 @@ export default async function DashboardPage() {
   const isLocked = Boolean(config?.submissions_locked)
   const isScoresPublished = Boolean(config?.scores_published)
   const hasSubmitted = !!(profile.project_description && profile.deploy_link && profile.screenshot_url)
+
+  // Team Building & Invitation System — see files/team_system_schema.sql for
+  // the underlying RPCs (all reads/writes go through them; profiles RLS
+  // doesn't allow reading other participants directly).
+  const { data: team } = await supabase.rpc('get_my_team')
+  const { data: myInvitations } = await supabase.rpc('get_my_invitations')
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -133,6 +141,13 @@ export default async function DashboardPage() {
           profile={profile}
           isLocked={isLocked}
           isScoresPublished={isScoresPublished}
+        />
+
+        {/* Team Section */}
+        <TeamSection
+          currentUserId={user.id}
+          team={(team as Team | null) ?? null}
+          invitations={(myInvitations as MyInvitations | null) ?? { incoming: [], outgoing: [] }}
         />
       </main>
     </div>
