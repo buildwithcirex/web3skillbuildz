@@ -37,7 +37,9 @@ CREATE TABLE public.teams (
 - **Configuration:** Public bucket so images can be rendered easily on the admin dashboard.
 
 ## 3. Automated Admin Initialization Trigger
-A Postgres function and trigger to auto-assign the admin role based on the environment variable, executing immediately upon user signup.
+A Postgres function and trigger to auto-assign the admin role, executing immediately upon user signup.
+
+> **Supabase note:** `ALTER DATABASE` is blocked in the Supabase SQL editor. Hardcode the admin email directly in the trigger instead of using `current_setting()`.
 
 ```sql
 CREATE OR REPLACE FUNCTION public.handle_new_user()
@@ -50,7 +52,7 @@ BEGIN
     NEW.email,
     NEW.raw_user_meta_data->>'phone',
     CASE 
-      WHEN NEW.email = current_setting('app.settings.admin_email', TRUE) THEN 'admin'
+      WHEN NEW.email = 'your-admin@email.com' THEN 'admin'
       ELSE 'participant'
     END
   );
