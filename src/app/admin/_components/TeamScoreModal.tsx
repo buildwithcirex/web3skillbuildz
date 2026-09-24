@@ -2,19 +2,19 @@
 
 import { useState } from 'react'
 import { X, ExternalLink, Award, MessageSquare, Check } from 'lucide-react'
-import type { Profile } from '@/lib/types'
-import { scoreSubmission } from '@/app/actions/project'
+import type { AdminTeamSummary } from '@/lib/team/types'
+import { scoreTeam } from '@/app/actions/project'
 
-interface ReviewModalProps {
-  profile: Profile
+interface TeamScoreModalProps {
+  team: AdminTeamSummary
   onClose: () => void
 }
 
-export default function ReviewModal({ profile, onClose }: ReviewModalProps) {
+export default function TeamScoreModal({ team, onClose }: TeamScoreModalProps) {
   const [score, setScore] = useState<string>(
-    profile.score !== null && profile.score !== undefined ? String(profile.score) : ''
+    team.score !== null && team.score !== undefined ? String(team.score) : ''
   )
-  const [feedback, setFeedback] = useState<string>(profile.feedback ?? '')
+  const [feedback, setFeedback] = useState<string>(team.feedback ?? '')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [savedSuccess, setSavedSuccess] = useState(false)
@@ -32,7 +32,7 @@ export default function ReviewModal({ profile, onClose }: ReviewModalProps) {
       return
     }
 
-    const result = await scoreSubmission(profile.id, numScore, feedback)
+    const result = await scoreTeam(team.id, numScore, feedback)
     setLoading(false)
 
     if (result?.error) {
@@ -46,7 +46,7 @@ export default function ReviewModal({ profile, onClose }: ReviewModalProps) {
   }
 
   const hasSubmission = Boolean(
-    profile.project_description || profile.deploy_link || profile.screenshot_url
+    team.projectDescription || team.deployLink || team.screenshotUrl
   )
 
   return (
@@ -55,9 +55,11 @@ export default function ReviewModal({ profile, onClose }: ReviewModalProps) {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-100 pb-4">
           <div>
-            <h3 className="text-xl font-bold text-gray-900">Review & Score Project</h3>
+            <h3 className="text-xl font-bold text-gray-900">Review & Score Team</h3>
             <p className="text-xs text-gray-500 mt-0.5">
-              Participant: <span className="font-semibold text-gray-800">{profile.name}</span> ({profile.email})
+              Team: <span className="font-semibold text-gray-800">{team.name}</span>
+              {' · '}
+              {team.members.map(m => m.name).join(', ')}
             </p>
           </div>
           <button
@@ -72,13 +74,13 @@ export default function ReviewModal({ profile, onClose }: ReviewModalProps) {
         {hasSubmission ? (
           <div className="space-y-4">
             {/* Screenshot */}
-            {profile.screenshot_url ? (
+            {team.screenshotUrl ? (
               <div>
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Screenshot</p>
                 <div className="rounded-xl overflow-hidden border border-gray-200 bg-gray-50 max-h-72 flex items-center justify-center">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={profile.screenshot_url}
+                    src={team.screenshotUrl}
                     alt="Project Screenshot"
                     className="w-full h-auto max-h-72 object-contain"
                   />
@@ -92,21 +94,21 @@ export default function ReviewModal({ profile, onClose }: ReviewModalProps) {
             <div>
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Project Description</p>
               <div className="bg-gray-50 border border-gray-200 rounded-xl p-3.5 text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
-                {profile.project_description ?? 'No description provided.'}
+                {team.projectDescription ?? 'No description provided.'}
               </div>
             </div>
 
             {/* Deploy Link */}
-            {profile.deploy_link && (
+            {team.deployLink && (
               <div>
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Deploy Link</p>
                 <a
-                  href={profile.deploy_link}
+                  href={team.deployLink}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-800 hover:underline"
                 >
-                  {profile.deploy_link}
+                  {team.deployLink}
                   <ExternalLink className="w-4 h-4" />
                 </a>
               </div>
@@ -115,7 +117,7 @@ export default function ReviewModal({ profile, onClose }: ReviewModalProps) {
         ) : (
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
             <p className="text-sm font-semibold text-amber-800">
-              This participant has not submitted a project yet.
+              This team has not submitted a project yet.
             </p>
             <p className="text-xs text-amber-700 mt-1">
               You can still assign notes or score them if evaluated offline.
@@ -147,14 +149,14 @@ export default function ReviewModal({ profile, onClose }: ReviewModalProps) {
             <div className="sm:col-span-2">
               <label htmlFor="modal_feedback" className="block text-sm font-semibold text-gray-800 mb-1.5">
                 <MessageSquare className="inline w-4 h-4 mr-1 text-indigo-600" />
-                Feedback / Comments (Visible to user)
+                Feedback / Comments (Visible to team)
               </label>
               <textarea
                 id="modal_feedback"
                 rows={3}
                 value={feedback}
                 onChange={e => setFeedback(e.target.value)}
-                placeholder="Add feedback for the participant..."
+                placeholder="Add feedback for the team..."
                 className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition resize-none"
               />
             </div>

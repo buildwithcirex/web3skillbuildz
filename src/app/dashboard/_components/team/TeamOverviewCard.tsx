@@ -1,14 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { Crown, Trash2, Users } from 'lucide-react'
-import { removeTeamMember } from '@/app/actions/team'
+import { Crown, Trash2, Users, Lock, Unlock } from 'lucide-react'
+import { removeTeamMember, lockTeam } from '@/app/actions/team'
 import type { Team, TeamMember } from '@/lib/team/types'
 
 export default function TeamOverviewCard({ team, currentUserId }: { team: Team; currentUserId: string }) {
   const [removeTarget, setRemoveTarget] = useState<TeamMember | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [locking, setLocking] = useState(false)
+  const [lockError, setLockError] = useState<string | null>(null)
 
   const handleRemove = async () => {
     if (!removeTarget) return
@@ -23,6 +25,17 @@ export default function TeamOverviewCard({ team, currentUserId }: { team: Team; 
     }
   }
 
+  const handleLock = async () => {
+    if (!confirm('Lock your team? This freezes membership — no one can be invited or removed afterward, and it unlocks submission.')) {
+      return
+    }
+    setLocking(true)
+    setLockError(null)
+    const result = await lockTeam()
+    setLocking(false)
+    if (result?.error) setLockError(result.error)
+  }
+
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
       <div className="flex items-center justify-between">
@@ -35,9 +48,20 @@ export default function TeamOverviewCard({ team, currentUserId }: { team: Team; 
             <p className="text-xs text-gray-400">Your Team</p>
           </div>
         </div>
-        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
-          {team.members.length}/{team.capacity} members
-        </span>
+        <div className="flex items-center gap-2">
+          {team.isLocked ? (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200">
+              <Lock className="w-3.5 h-3.5" /> Locked
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 border border-green-200">
+              <Unlock className="w-3.5 h-3.5" /> Open
+            </span>
+          )}
+          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
+            {team.members.length}/{team.capacity} members
+          </span>
+        </div>
       </div>
 
       <ul className="divide-y divide-gray-50">
@@ -59,7 +83,7 @@ export default function TeamOverviewCard({ team, currentUserId }: { team: Team; 
                 <p className="text-xs text-gray-400">{member.email}</p>
               </div>
             </div>
-            {team.isLeader && member.id !== currentUserId && (
+            {team.isLeader && !team.isLocked && member.id !== currentUserId && (
               <button
                 onClick={() => {
                   setRemoveTarget(member)
@@ -75,6 +99,25 @@ export default function TeamOverviewCard({ team, currentUserId }: { team: Team; 
           </li>
         ))}
       </ul>
+
+      {team.isLeader && !team.isLocked && (
+        <div className="pt-2 border-t border-gray-100 space-y-2">
+          <p className="text-xs text-gray-500">
+            Locking your team freezes its membership and is required before you can submit a project.
+          </p>
+          {lockError && (
+            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{lockError}</p>
+          )}
+          <button
+            onClick={handleLock}
+            disabled={locking}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white text-xs font-bold transition shadow-xs"
+          >
+            <Lock className="w-3.5 h-3.5" />
+            {locking ? 'Locking…' : 'Lock My Team'}
+          </button>
+        </div>
+      )}
 
       {removeTarget && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">

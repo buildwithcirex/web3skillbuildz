@@ -6,6 +6,12 @@ interface DashboardNavProps {
   activeTab?: 'home' | 'submission' | 'result'
 }
 
+const TABS: { key: NonNullable<DashboardNavProps['activeTab']>; label: string; href: string }[] = [
+  { key: 'home', label: 'Home', href: '/dashboard' },
+  { key: 'submission', label: 'Submission', href: '/dashboard/submit' },
+  { key: 'result', label: 'Results', href: '/dashboard/results' },
+]
+
 export default function DashboardNav({ profileName, activeTab }: DashboardNavProps) {
   return (
     <header className="bg-white border-b border-gray-200 shadow-sm">
@@ -20,6 +26,21 @@ export default function DashboardNav({ profileName, activeTab }: DashboardNavPro
             <span className="font-bold text-gray-900 hidden sm:block">SkillBuildz</span>
           </Link>
 
+          <nav className="hidden sm:flex items-center gap-1">
+            {TABS.map(tab => (
+              <Link
+                key={tab.key}
+                href={tab.href}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+                  activeTab === tab.key
+                    ? 'bg-indigo-50 text-indigo-700'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+              >
+                {tab.label}
+              </Link>
+            ))}
+          </nav>
         </div>
 
         <div className="flex items-center gap-4">

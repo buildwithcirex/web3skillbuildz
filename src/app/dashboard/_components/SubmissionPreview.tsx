@@ -1,19 +1,19 @@
 'use client'
 
 import { useState } from 'react'
-import type { Profile } from '@/lib/types'
+import type { Team } from '@/lib/team/types'
 import { ExternalLink, Edit3, RotateCcw, Lock, Award, MessageSquare } from 'lucide-react'
 import { revertSubmission } from '@/app/actions/project'
 
 interface SubmissionPreviewProps {
-  profile: Profile
+  team: Team
   isLocked: boolean
   isScoresPublished: boolean
   onEdit: () => void
 }
 
 export default function SubmissionPreview({
-  profile,
+  team,
   isLocked,
   isScoresPublished,
   onEdit,
@@ -35,7 +35,7 @@ export default function SubmissionPreview({
     }
   }
 
-  const hasScore = profile.score !== null && profile.score !== undefined
+  const hasScore = team.score !== null && team.score !== undefined
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
@@ -43,7 +43,7 @@ export default function SubmissionPreview({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold text-gray-900">Your Project Submission</h3>
-          <p className="text-xs text-gray-500 mt-0.5">Submitted on {new Date(profile.created_at).toLocaleDateString()}</p>
+          <p className="text-xs text-gray-500 mt-0.5">Submitted by {team.name}</p>
         </div>
         <div className="flex items-center gap-2">
           {isLocked ? (
@@ -69,16 +69,16 @@ export default function SubmissionPreview({
               <h4 className="text-sm font-bold text-gray-900">Evaluation Score</h4>
             </div>
             <div className="text-2xl font-black text-indigo-700 bg-white px-3 py-1 rounded-xl shadow-xs border border-indigo-100">
-              {profile.score} <span className="text-xs font-normal text-gray-500">/ 100</span>
+              {team.score} <span className="text-xs font-normal text-gray-500">/ 100</span>
             </div>
           </div>
-          {profile.feedback && (
+          {team.feedback && (
             <div className="bg-white/80 rounded-xl p-3.5 border border-indigo-50 space-y-1">
               <div className="flex items-center gap-1.5 text-xs font-semibold text-indigo-900">
                 <MessageSquare className="w-3.5 h-3.5 text-indigo-600" />
                 Organizer Feedback:
               </div>
-              <p className="text-sm text-gray-700 italic">&ldquo;{profile.feedback}&rdquo;</p>
+              <p className="text-sm text-gray-700 italic">&ldquo;{team.feedback}&rdquo;</p>
             </div>
           )}
         </div>
@@ -93,11 +93,11 @@ export default function SubmissionPreview({
       )}
 
       {/* Screenshot */}
-      {profile.screenshot_url && (
+      {team.screenshotUrl && (
         <div className="rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={profile.screenshot_url}
+            src={team.screenshotUrl}
             alt="Project Screenshot"
             className="w-full object-cover max-h-80"
           />
@@ -107,19 +107,19 @@ export default function SubmissionPreview({
       {/* Description */}
       <div>
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Description</p>
-        <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{profile.project_description}</p>
+        <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{team.projectDescription}</p>
       </div>
 
       {/* Deploy Link */}
       <div>
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Live Project</p>
         <a
-          href={profile.deploy_link ?? '#'}
+          href={team.deployLink ?? '#'}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-800 font-semibold transition"
         >
-          {profile.deploy_link}
+          {team.deployLink}
           <ExternalLink className="w-4 h-4" />
         </a>
       </div>

@@ -73,3 +73,22 @@ table access). Full schema, RLS policies, and RPCs: see
 Supabase SQL editor after the schema above. `MAX_TEAM_SIZE` (3) and the
 per-recipient invite cooldown (10s) are defined there and mirrored in
 `src/lib/team/constants.ts`.
+
+**Note:** `profiles.team_id` above is unused/dead — real team membership is
+tracked exclusively via `team_members`. Left in place for now; safe to drop
+in a future cleanup pass.
+
+## 5. Team-Level Submission, Scoring & Locking
+Project submission and scoring moved from `profiles` (1 row per participant)
+to `teams` (1 row per team) — participants are scored as a team, not
+individually. Adds to `teams`: `project_description`, `deploy_link`,
+`screenshot_url`, `score` (0–100), `feedback`, `is_locked`, `locked_at`.
+Adds `event_config.team_formation_locked` (the "Lock Team Formation" global
+toggle, independent of the existing `submissions_locked` toggle). Drops the
+now-unused `project_description`/`deploy_link`/`screenshot_url`/`score`/
+`feedback` columns from `profiles`. New RPCs (`lock_team`, `unlock_team`,
+`set_team_formation_lock`, `submit_team_project`, `revert_team_submission`,
+`score_team`, `admin_list_teams`, `get_leaderboard`) and updated
+`get_my_team()`: see the "Phase 2" section at the bottom of
+[`team_system_schema.sql`](./team_system_schema.sql) — run it once in the
+Supabase SQL editor (idempotent, safe to re-run).

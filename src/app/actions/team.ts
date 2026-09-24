@@ -86,3 +86,38 @@ export async function removeTeamMember(memberId: string): Promise<ActionResult> 
   revalidatePath('/dashboard')
   return { error: null }
 }
+
+// Auto-creates a solo team ("{FirstName}'s Team") the first time a teamless
+// participant tries to submit. A no-op if they're already on a team.
+export async function ensureSoloTeam(): Promise<ActionResult> {
+  const { supabase, user } = await getAuthedClient()
+
+  const { data: existing } = await supabase.rpc('get_my_team')
+  if (existing) return { error: null }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('name')
+    .eq('id', user.id)
+    .maybeSingle()
+
+  const firstName = (profile?.name ?? '').trim().split(/\s+/)[0] || 'My'
+
+  const { error } = await supabase.rpc('create_team', { p_name: `${firstName}'s Team` })
+  if (error) return { error: toUserMessage(error.message) }
+
+  revalidatePath('/dashboard')
+  revalidatePath('/dashboard/submit')
+  return { error: null }
+}
+
+export async function lockTeam(): Promise<ActionResult> {
+  const { supabase } = await getAuthedClient()
+
+  const { error } = await supabase.rpc('lock_team')
+  if (error) return { error: toUserMessage(error.message) }
+
+  revalidatePath('/dashboard')
+  revalidatePath('/dashboard/submit')
+  return { error: null }
+}

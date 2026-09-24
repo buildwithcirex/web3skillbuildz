@@ -58,10 +58,12 @@ export default async function DashboardPage() {
 
   const isLocked = Boolean(config?.submissions_locked)
   const isScoresPublished = Boolean(config?.scores_published)
-  const hasSubmitted = !!(profile.project_description && profile.deploy_link && profile.screenshot_url)
 
   const { data: team } = await supabase.rpc('get_my_team')
   const { data: myInvitations } = await supabase.rpc('get_my_invitations')
+
+  const typedTeam = (team as Team | null) ?? null
+  const hasSubmitted = !!(typedTeam?.projectDescription && typedTeam?.deployLink && typedTeam?.screenshotUrl)
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -164,7 +166,7 @@ export default async function DashboardPage() {
         {/* Team Section */}
         <TeamSection
           currentUserId={user.id}
-          team={(team as Team | null) ?? null}
+          team={typedTeam}
           invitations={(myInvitations as MyInvitations | null) ?? { incoming: [], outgoing: [] }}
         />
       </main>

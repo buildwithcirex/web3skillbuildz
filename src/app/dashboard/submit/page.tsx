@@ -4,6 +4,7 @@ import { signOut } from '@/app/actions/auth'
 import DashboardNav from '../_components/DashboardNav'
 import ParticipantSubmissionSection from '../_components/ParticipantSubmissionSection'
 import type { Profile } from '@/lib/types'
+import type { Team } from '@/lib/team/types'
 
 export default async function SubmitPage() {
   const supabase = await createClient()
@@ -52,6 +53,8 @@ export default async function SubmitPage() {
   const isLocked = Boolean(config?.submissions_locked)
   const isScoresPublished = Boolean(config?.scores_published)
 
+  const { data: team } = await supabase.rpc('get_my_team')
+
   return (
     <div className="min-h-screen bg-gray-50">
       <DashboardNav profileName={profile.name} activeTab="submission" />
@@ -63,8 +66,8 @@ export default async function SubmitPage() {
         </div>
 
         <ParticipantSubmissionSection
-          profile={profile}
-          isLocked={isLocked}
+          team={(team as Team | null) ?? null}
+          isSubmissionsLocked={isLocked}
           isScoresPublished={isScoresPublished}
         />
       </main>

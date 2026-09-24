@@ -1,17 +1,14 @@
 'use client'
 
-import { useState, useMemo, Fragment } from 'react'
-import { Search, Edit, Trash2, ShieldCheck, ExternalLink, X, ChevronDown, ChevronUp, Award } from 'lucide-react'
+import { useState, useMemo } from 'react'
+import { Search, Edit, Trash2, ShieldCheck, X } from 'lucide-react'
 import type { Profile } from '@/lib/types'
 import { updateParticipant, deleteParticipant, promoteToAdmin } from '@/app/actions/project'
-import ReviewModal from './ReviewModal'
 
 export default function ParticipantsTable({ profiles }: { profiles: Profile[] }) {
   const [query, setQuery] = useState('')
   const [editTarget, setEditTarget] = useState<Profile | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Profile | null>(null)
-  const [reviewTarget, setReviewTarget] = useState<Profile | null>(null)
-  const [expandedRow, setExpandedRow] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
 
@@ -109,8 +106,6 @@ export default function ParticipantsTable({ profiles }: { profiles: Profile[] })
               <th className="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider px-5 py-3">Name</th>
               <th className="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider px-5 py-3 hidden md:table-cell">Email</th>
               <th className="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider px-5 py-3 hidden lg:table-cell">Phone</th>
-              <th className="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider px-5 py-3">Status</th>
-              <th className="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider px-5 py-3">Score</th>
               <th className="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider px-5 py-3">Role</th>
               <th className="text-right text-xs font-semibold text-gray-400 uppercase tracking-wider px-5 py-3">Actions</th>
             </tr>
@@ -118,146 +113,64 @@ export default function ParticipantsTable({ profiles }: { profiles: Profile[] })
           <tbody className="divide-y divide-gray-50">
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={7} className="text-center text-sm text-gray-400 py-12">
+                <td colSpan={5} className="text-center text-sm text-gray-400 py-12">
                   No participants found.
                 </td>
               </tr>
             ) : (
               filtered.map(profile => (
-                <Fragment key={profile.id}>
-                  <tr className="hover:bg-gray-50/50 transition">
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-2">
+                <tr key={profile.id} className="hover:bg-gray-50/50 transition">
+                  <td className="px-5 py-4">
+                    <p className="text-sm font-medium text-gray-900">{profile.name}</p>
+                    <p className="text-xs text-gray-400 md:hidden">{profile.email}</p>
+                  </td>
+                  <td className="px-5 py-4 hidden md:table-cell">
+                    <p className="text-sm text-gray-600">{profile.email}</p>
+                  </td>
+                  <td className="px-5 py-4 hidden lg:table-cell">
+                    <p className="text-sm text-gray-600">{profile.phone}</p>
+                  </td>
+                  <td className="px-5 py-4">
+                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                      profile.role === 'admin'
+                        ? 'text-indigo-700 bg-indigo-100'
+                        : 'text-gray-600 bg-gray-100'
+                    }`}>
+                      {profile.role}
+                    </span>
+                  </td>
+                  <td className="px-5 py-4">
+                    <div className="flex items-center justify-end gap-2">
+                      {profile.role === 'participant' && (
                         <button
-                          onClick={() => setExpandedRow(expandedRow === profile.id ? null : profile.id)}
-                          className="text-gray-400 hover:text-indigo-600 transition"
+                          onClick={() => handlePromote(profile.id)}
+                          disabled={loading}
+                          title="Promote to Admin"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-xs font-semibold transition"
                         >
-                          {expandedRow === profile.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                          <ShieldCheck className="w-3.5 h-3.5" />
+                          <span>Promote</span>
                         </button>
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">{profile.name}</p>
-                          <p className="text-xs text-gray-400 md:hidden">{profile.email}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-5 py-4 hidden md:table-cell">
-                      <p className="text-sm text-gray-600">{profile.email}</p>
-                    </td>
-                    <td className="px-5 py-4 hidden lg:table-cell">
-                      <p className="text-sm text-gray-600">{profile.phone}</p>
-                    </td>
-                    <td className="px-5 py-4">
-                      {profile.project_description ? (
-                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
-                          ✓ Submitted
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded-full">
-                          Pending
-                        </span>
                       )}
-                    </td>
-                    <td className="px-5 py-4">
-                      {profile.score !== null && profile.score !== undefined ? (
-                        <span className="inline-flex items-center gap-1 text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-lg">
-                          <Award className="w-3 h-3 text-amber-500" />
-                          {profile.score}/100
-                        </span>
-                      ) : (
-                        <span className="text-xs text-gray-400 font-medium">—</span>
-                      )}
-                    </td>
-                    <td className="px-5 py-4">
-                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                        profile.role === 'admin'
-                          ? 'text-indigo-700 bg-indigo-100'
-                          : 'text-gray-600 bg-gray-100'
-                      }`}>
-                        {profile.role}
-                      </span>
-                    </td>
-                    <td className="px-5 py-4">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => setReviewTarget(profile)}
-                          title="Review & Score"
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 text-xs font-semibold transition"
-                        >
-                          <Award className="w-3.5 h-3.5 text-purple-600" />
-                          <span>Review</span>
-                        </button>
-                        {profile.role === 'participant' && (
-                          <button
-                            onClick={() => handlePromote(profile.id)}
-                            disabled={loading}
-                            title="Promote to Admin"
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-xs font-semibold transition"
-                          >
-                            <ShieldCheck className="w-3.5 h-3.5" />
-                            <span>Promote</span>
-                          </button>
-                        )}
-                        <button
-                          onClick={() => openEdit(profile)}
-                          title="Edit Participant"
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-xs font-semibold transition"
-                        >
-                          <Edit className="w-3.5 h-3.5" />
-                          <span>Edit</span>
-                        </button>
-                        <button
-                          onClick={() => { setDeleteTarget(profile); setActionError(null) }}
-                          title="Delete Participant"
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 text-xs font-semibold transition"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                          <span>Delete</span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  {/* Expanded Row */}
-                  {expandedRow === profile.id && (
-                    <tr key={`${profile.id}-expanded`} className="bg-indigo-50/30">
-                      <td colSpan={7} className="px-8 py-4">
-                        {profile.project_description ? (
-                          <div className="flex flex-col sm:flex-row gap-6">
-                            {profile.screenshot_url && (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img
-                                src={profile.screenshot_url}
-                                alt="Screenshot"
-                                className="w-full sm:w-48 h-32 object-cover rounded-lg border border-gray-200"
-                              />
-                            )}
-                            <div className="flex-1 space-y-2">
-                              <div>
-                                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Description</p>
-                                <p className="text-sm text-gray-700 mt-0.5">{profile.project_description}</p>
-                              </div>
-                              {profile.deploy_link && (
-                                <div>
-                                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Deploy Link</p>
-                                  <a
-                                    href={profile.deploy_link}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1 text-sm text-indigo-600 hover:underline mt-0.5"
-                                  >
-                                    {profile.deploy_link} <ExternalLink className="w-3 h-3" />
-                                  </a>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        ) : (
-                          <p className="text-sm text-gray-400 italic">No project submitted yet.</p>
-                        )}
-                      </td>
-                    </tr>
-                  )}
-                </Fragment>
+                      <button
+                        onClick={() => openEdit(profile)}
+                        title="Edit Participant"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-xs font-semibold transition"
+                      >
+                        <Edit className="w-3.5 h-3.5" />
+                        <span>Edit</span>
+                      </button>
+                      <button
+                        onClick={() => { setDeleteTarget(profile); setActionError(null) }}
+                        title="Delete Participant"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 text-xs font-semibold transition"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Delete</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
               ))
             )}
           </tbody>
@@ -357,14 +270,6 @@ export default function ParticipantsTable({ profiles }: { profiles: Profile[] })
             </div>
           </div>
         </div>
-      )}
-
-      {/* Review & Score Modal */}
-      {reviewTarget && (
-        <ReviewModal
-          profile={reviewTarget}
-          onClose={() => setReviewTarget(null)}
-        />
       )}
     </div>
   )

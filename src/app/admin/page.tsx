@@ -2,9 +2,12 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { signOut } from '@/app/actions/auth'
 import ParticipantsTable from './_components/ParticipantsTable'
+import TeamsPanel from './_components/TeamsPanel'
 import LockSubmissionsToggle from './_components/LockSubmissionsToggle'
 import PublishScoresToggle from './_components/PublishScoresToggle'
+import TeamFormationLockToggle from './_components/TeamFormationLockToggle'
 import type { Profile } from '@/lib/types'
+import type { AdminTeamSummary } from '@/lib/team/types'
 
 export default async function AdminPage() {
   const supabase = await createClient()
@@ -24,21 +27,25 @@ export default async function AdminPage() {
   // Fetch lock status and scores published status
   const { data: config } = await supabase
     .from('event_config')
-    .select('submissions_locked, scores_published')
+    .select('submissions_locked, scores_published, team_formation_locked')
     .eq('id', 1)
     .maybeSingle()
 
   const isLocked = Boolean(config?.submissions_locked)
   const isScoresPublished = Boolean(config?.scores_published)
+  const isTeamFormationLocked = Boolean(config?.team_formation_locked)
 
   const { data: participants, error } = await supabase
     .from('profiles')
     .select('*')
     .order('created_at', { ascending: false })
 
+  const { data: teamsData, error: teamsError } = await supabase.rpc('admin_list_teams')
+
   const allProfiles = (participants as Profile[]) ?? []
-  const totalSubmissions = allProfiles.filter(p => p.project_description).length
-  const totalReviewed = allProfiles.filter(p => p.score !== null && p.score !== undefined).length
+  const allTeams = (teamsData as AdminTeamSummary[]) ?? []
+  const totalSubmissions = allTeams.filter(t => t.projectDescription).length
+  const totalReviewed = allTeams.filter(t => t.score !== null && t.score !== undefined).length
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -84,6 +91,7 @@ export default async function AdminPage() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
+            <TeamFormationLockToggle isLocked={isTeamFormationLocked} />
             <LockSubmissionsToggle isLocked={isLocked} />
             <PublishScoresToggle isPublished={isScoresPublished} />
           </div>
@@ -96,12 +104,12 @@ export default async function AdminPage() {
             <p className="text-3xl font-bold text-gray-900">{allProfiles.length}</p>
           </div>
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Projects Submitted</p>
-            <p className="text-3xl font-bold text-indigo-600">{totalSubmissions}</p>
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Teams Submitted</p>
+            <p className="text-3xl font-bold text-indigo-600">{totalSubmissions} / {allTeams.length}</p>
           </div>
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Reviewed & Scored</p>
-            <p className="text-3xl font-bold text-purple-600">{totalReviewed}</p>
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Teams Reviewed & Scored</p>
+            <p className="text-3xl font-bold text-purple-600">{totalReviewed} / {allTeams.length}</p>
           </div>
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Results Visibility</p>
@@ -124,8 +132,16 @@ export default async function AdminPage() {
             Error loading participants: {error.message}
           </div>
         )}
+        {teamsError && (
+          <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+            Error loading teams: {teamsError.message}
+          </div>
+        )}
 
-        {/* Table */}
+        {/* Teams */}
+        <TeamsPanel teams={allTeams} />
+
+        {/* Participants (account management) */}
         <ParticipantsTable profiles={allProfiles} />
       </main>
     </div>

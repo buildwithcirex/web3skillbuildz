@@ -14,7 +14,52 @@ export interface Team {
   leaderId: string
   isLeader: boolean
   capacity: number
+  isLocked: boolean
+  lockedAt: string | null
+  projectDescription: string | null
+  deployLink: string | null
+  screenshotUrl: string | null
+  score: number | null
+  feedback: string | null
   members: TeamMember[]
+}
+
+export interface AdminTeamMember {
+  id: string
+  name: string
+  email: string
+  role: TeamMemberRole
+}
+
+export interface AdminTeamSummary {
+  id: string
+  name: string
+  leaderId: string
+  isLocked: boolean
+  lockedAt: string | null
+  projectDescription: string | null
+  deployLink: string | null
+  screenshotUrl: string | null
+  score: number | null
+  feedback: string | null
+  members: AdminTeamMember[]
+}
+
+export interface LeaderboardMember {
+  id: string
+  name: string
+}
+
+export interface LeaderboardTeam {
+  id: string
+  name: string
+  score: number | null
+  members: LeaderboardMember[]
+}
+
+export interface LeaderboardResponse {
+  published: boolean
+  teams: LeaderboardTeam[]
 }
 
 export interface IncomingInvitation {
@@ -67,6 +112,10 @@ export type TeamErrorCode =
   | 'COOLDOWN_ACTIVE'
   | 'INVITATION_NOT_FOUND'
   | 'INVITATION_NOT_PENDING'
+  | 'TEAM_LOCKED'
+  | 'TEAM_NOT_LOCKED'
+  | 'SUBMISSIONS_LOCKED'
+  | 'INVALID_SCORE'
 
 export const TEAM_ERROR_MESSAGES: Record<TeamErrorCode, string> = {
   UNAUTHORIZED: 'You are not authorized to perform this action.',
@@ -83,6 +132,10 @@ export const TEAM_ERROR_MESSAGES: Record<TeamErrorCode, string> = {
   COOLDOWN_ACTIVE: 'Please wait a few seconds before inviting this user again.',
   INVITATION_NOT_FOUND: 'This invitation no longer exists.',
   INVITATION_NOT_PENDING: 'This invitation has already been processed.',
+  TEAM_LOCKED: 'Your team is locked, so membership can no longer change.',
+  TEAM_NOT_LOCKED: 'Your team must be locked before you can submit.',
+  SUBMISSIONS_LOCKED: 'Submissions have been locked by the event organizer.',
+  INVALID_SCORE: 'Score must be a number between 0 and 100.',
 }
 
 export const DEFAULT_TEAM_ERROR_MESSAGE =

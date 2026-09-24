@@ -23,6 +23,19 @@ async function checkIsAdmin(supabase: Awaited<ReturnType<typeof createClient>>, 
   return profile?.role === 'admin'
 }
 
+function toSubmissionMessage(rawMessage: string | undefined): string {
+  switch ((rawMessage ?? '').trim()) {
+    case 'NO_TEAM':
+      return 'You need to be part of a team to submit a project.'
+    case 'TEAM_NOT_LOCKED':
+      return 'Your team must be locked before you can submit.'
+    case 'SUBMISSIONS_LOCKED':
+      return 'Submissions have been locked by the event organizer. No changes can be submitted.'
+    default:
+      return rawMessage || 'Something went wrong while saving your submission.'
+  }
+}
+
 export async function submitProject(
   prevState: { error: string | null; success: boolean },
   formData: FormData
@@ -32,20 +45,6 @@ export async function submitProject(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/')
 
-  // Check if submissions are locked
-  const { data: config } = await supabase
-    .from('event_config')
-    .select('submissions_locked')
-    .eq('id', 1)
-    .maybeSingle()
-
-  if (config?.submissions_locked) {
-    return {
-      error: 'Submissions have been locked by the event organizer. No changes can be submitted.',
-      success: false,
-    }
-  }
-
   const description = formData.get('project_description') as string
   const deployLink = formData.get('deploy_link') as string
   const screenshotUrl = formData.get('screenshot_url') as string
@@ -54,20 +53,18 @@ export async function submitProject(
     return { error: 'All fields including screenshot are required.', success: false }
   }
 
-  const { error } = await supabase
-    .from('profiles')
-    .update({
-      project_description: description,
-      deploy_link: deployLink,
-      screenshot_url: screenshotUrl,
-    })
-    .eq('id', user.id)
+  const { error } = await supabase.rpc('submit_team_project', {
+    p_description: description,
+    p_deploy_link: deployLink,
+    p_screenshot_url: screenshotUrl,
+  })
 
   if (error) {
-    return { error: error.message, success: false }
+    return { error: toSubmissionMessage(error.message), success: false }
   }
 
   revalidatePath('/dashboard')
+  revalidatePath('/dashboard/submit')
   revalidatePath('/admin')
   return { error: null, success: true }
 }
@@ -78,29 +75,12 @@ export async function revertSubmission() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/')
 
-  // Check if submissions are locked
-  const { data: config } = await supabase
-    .from('event_config')
-    .select('submissions_locked')
-    .eq('id', 1)
-    .maybeSingle()
+  const { error } = await supabase.rpc('revert_team_submission')
 
-  if (config?.submissions_locked) {
-    return { error: 'Submissions are locked. You cannot revert or modify your submission.' }
-  }
-
-  const { error } = await supabase
-    .from('profiles')
-    .update({
-      project_description: null,
-      deploy_link: null,
-      screenshot_url: null,
-    })
-    .eq('id', user.id)
-
-  if (error) return { error: error.message }
+  if (error) return { error: toSubmissionMessage(error.message) }
 
   revalidatePath('/dashboard')
+  revalidatePath('/dashboard/submit')
   revalidatePath('/admin')
   return { error: null }
 }
@@ -154,11 +134,49 @@ export async function toggleScoresPublished(published: boolean) {
 
   revalidatePath('/admin')
   revalidatePath('/dashboard')
+  revalidatePath('/dashboard/results')
   return { error: null }
 }
 
-export async function scoreSubmission(
-  userId: string,
+export async function toggleTeamFormationLock(locked: boolean) {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/')
+
+  const isAdmin = await checkIsAdmin(supabase, user)
+  if (!isAdmin) {
+    return { error: 'Unauthorized: Admin access required.' }
+  }
+
+  const { error } = await supabase.rpc('set_team_formation_lock', { p_locked: locked })
+  if (error) return { error: error.message }
+
+  revalidatePath('/admin')
+  revalidatePath('/dashboard')
+  return { error: null }
+}
+
+export async function unlockTeam(teamId: string) {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/')
+
+  const isAdmin = await checkIsAdmin(supabase, user)
+  if (!isAdmin) {
+    return { error: 'Unauthorized: Admin access required.' }
+  }
+
+  const { error } = await supabase.rpc('unlock_team', { p_team_id: teamId })
+  if (error) return { error: error.message }
+
+  revalidatePath('/admin')
+  return { error: null }
+}
+
+export async function scoreTeam(
+  teamId: string,
   score: number | null,
   feedback: string | null
 ) {
@@ -172,18 +190,17 @@ export async function scoreSubmission(
     return { error: 'Unauthorized: Admin access required.' }
   }
 
-  const { error } = await supabase
-    .from('profiles')
-    .update({
-      score,
-      feedback: feedback ? feedback.trim() : null,
-    })
-    .eq('id', userId)
+  const { error } = await supabase.rpc('score_team', {
+    p_team_id: teamId,
+    p_score: score,
+    p_feedback: feedback,
+  })
 
   if (error) return { error: error.message }
 
   revalidatePath('/admin')
   revalidatePath('/dashboard')
+  revalidatePath('/dashboard/results')
   return { error: null }
 }
 
@@ -223,23 +240,27 @@ export async function deleteParticipant(userId: string) {
     return { error: 'Unauthorized: Admin access required.' }
   }
 
-  // 1. Fetch profile to check if they have a screenshot uploaded
-  const { data: targetProfile } = await supabase
-    .from('profiles')
+  // 1. If this participant leads a team, that team's screenshot (submission
+  // now lives on `teams`, not `profiles`) is about to be orphaned: deleting
+  // this profile cascades (teams.leader_id ON DELETE CASCADE) to delete the
+  // whole team row along with it. Clean up its storage file first.
+  // Note: this cascade-deletes the team's submission/score too if they're
+  // the leader — a pre-existing behavior, not fixed here.
+  const { data: ledTeam } = await supabase
+    .from('teams')
     .select('screenshot_url')
-    .eq('id', userId)
+    .eq('leader_id', userId)
     .maybeSingle()
 
-  // If a screenshot was uploaded, delete it from storage bucket
-  if (targetProfile?.screenshot_url) {
+  if (ledTeam?.screenshot_url) {
     try {
-      const parts = targetProfile.screenshot_url.split('/project_screenshots/')
+      const parts = ledTeam.screenshot_url.split('/project_screenshots/')
       if (parts.length > 1) {
         const filePath = decodeURIComponent(parts[1])
         await supabase.storage.from('project_screenshots').remove([filePath])
       }
     } catch (storageErr) {
-      console.error('Error removing screenshot during user deletion:', storageErr)
+      console.error('Error removing team screenshot during user deletion:', storageErr)
     }
   }
 
