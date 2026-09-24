@@ -581,13 +581,15 @@ LANGUAGE sql SECURITY DEFINER STABLE SET search_path = public AS $$
 $$;
 
 -- ---------- Membership freeze on locked teams ----------
+-- Re-declared here (after the "Leadership is determined by teams.leader_id"
+-- change above) only to add the TEAM_LOCKED check — the leader/promotion
+-- logic below must stay identical to the version earlier in this file.
 CREATE OR REPLACE FUNCTION public.send_team_invitation(p_recipient_id UUID)
 RETURNS UUID
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 DECLARE
   v_uid UUID := auth.uid();
   v_team_id UUID;
-  v_role TEXT;
   v_member_count INTEGER;
   v_last_sent TIMESTAMPTZ;
   v_invitation_id UUID;
@@ -601,19 +603,26 @@ BEGIN
     RAISE EXCEPTION 'CANNOT_INVITE_SELF';
   END IF;
 
-  SELECT team_id, role INTO v_team_id, v_role FROM public.team_members WHERE user_id = v_uid;
+  SELECT team_id INTO v_team_id FROM public.team_members WHERE user_id = v_uid;
 
   IF v_team_id IS NULL THEN
     RAISE EXCEPTION 'NO_TEAM';
   END IF;
 
-  IF v_role <> 'leader' THEN
+  -- Leadership is determined by teams.leader_id, not team_members.role.
+  -- This allows the creator (whose role starts as 'member') to send their
+  -- first invitation. On that first send, they are promoted to 'leader'.
+  IF NOT EXISTS (SELECT 1 FROM public.teams WHERE id = v_team_id AND leader_id = v_uid) THEN
     RAISE EXCEPTION 'NOT_LEADER';
   END IF;
 
   IF (SELECT is_locked FROM public.teams WHERE id = v_team_id) THEN
     RAISE EXCEPTION 'TEAM_LOCKED';
   END IF;
+
+  -- Promote to 'leader' role on first invitation sent.
+  UPDATE public.team_members SET role = 'leader'
+  WHERE team_id = v_team_id AND user_id = v_uid AND role <> 'leader';
 
   IF NOT EXISTS (SELECT 1 FROM public.profiles WHERE id = p_recipient_id AND role = 'participant') THEN
     RAISE EXCEPTION 'RECIPIENT_NOT_FOUND';
@@ -725,7 +734,6 @@ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 DECLARE
   v_uid UUID := auth.uid();
   v_my_team_id UUID;
-  v_my_role TEXT;
   v_target_team_id UUID;
 BEGIN
   IF v_uid IS NULL THEN
@@ -736,9 +744,13 @@ BEGIN
     RAISE EXCEPTION 'CANNOT_REMOVE_SELF';
   END IF;
 
-  SELECT team_id, role INTO v_my_team_id, v_my_role FROM public.team_members WHERE user_id = v_uid;
+  SELECT team_id INTO v_my_team_id FROM public.team_members WHERE user_id = v_uid;
 
-  IF v_my_team_id IS NULL OR v_my_role <> 'leader' THEN
+  -- Leadership is determined by teams.leader_id, not team_members.role
+  -- (see send_team_invitation above).
+  IF v_my_team_id IS NULL OR NOT EXISTS (
+    SELECT 1 FROM public.teams WHERE id = v_my_team_id AND leader_id = v_uid
+  ) THEN
     RAISE EXCEPTION 'NOT_LEADER';
   END IF;
 
@@ -810,18 +822,22 @@ $$;
 
 -- ---------- Locking ----------
 
--- Leader self-lock. Idempotent no-op if already locked.
+-- Leader self-lock. Idempotent no-op if already locked. Leadership is
+-- determined by teams.leader_id, not team_members.role (see
+-- send_team_invitation above) — this lets a solo team's creator, whose
+-- role starts as 'member' until their first invite, lock their own team.
 CREATE OR REPLACE FUNCTION public.lock_team()
 RETURNS VOID LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 DECLARE
   v_uid UUID := auth.uid();
   v_team_id UUID;
-  v_role TEXT;
 BEGIN
   IF v_uid IS NULL THEN RAISE EXCEPTION 'UNAUTHORIZED'; END IF;
-  SELECT team_id, role INTO v_team_id, v_role FROM public.team_members WHERE user_id = v_uid;
+  SELECT team_id INTO v_team_id FROM public.team_members WHERE user_id = v_uid;
   IF v_team_id IS NULL THEN RAISE EXCEPTION 'NO_TEAM'; END IF;
-  IF v_role <> 'leader' THEN RAISE EXCEPTION 'NOT_LEADER'; END IF;
+  IF NOT EXISTS (SELECT 1 FROM public.teams WHERE id = v_team_id AND leader_id = v_uid) THEN
+    RAISE EXCEPTION 'NOT_LEADER';
+  END IF;
   UPDATE public.teams SET is_locked = TRUE, locked_at = NOW() WHERE id = v_team_id AND is_locked = FALSE;
 END; $$;
 
