@@ -21,7 +21,12 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 NEXT_PUBLIC_ADMIN_EMAIL=admin_user@yourdomain.com
 ```
 
-## 4. Run the Development Server
+## 4. Database Schema
+Run `database_schema.md`'s SQL in the Supabase SQL editor, then run
+[`team_system_schema.sql`](./team_system_schema.sql) (adds the Team Building
+& Invitation System — tables, RLS, and RPCs).
+
+## 5. Run the Development Server
 ```bash
 npm run dev
 ```

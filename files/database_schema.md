@@ -47,3 +47,14 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 ```
+
+## 4. Team Building & Invitation System
+Adds `teams`, `team_members`, `team_invitations`, and `notifications` tables, a
+capacity-enforcing trigger, and `SECURITY DEFINER` RPC functions for every
+read/write (since `profiles` RLS only allows reading your own row, all
+cross-user team logic has to go through these functions rather than direct
+table access). Full schema, RLS policies, and RPCs: see
+[`team_system_schema.sql`](./team_system_schema.sql) — run it once in the
+Supabase SQL editor after the schema above. `MAX_TEAM_SIZE` (3) and the
+per-recipient invite cooldown (10s) are defined there and mirrored in
+`src/lib/team/constants.ts`.
