@@ -44,6 +44,7 @@ export function useTeamNotifications(userId: string) {
 
   useEffect(() => {
     const supported = typeof window !== 'undefined' && 'Notification' in window
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setShowPrompt(supported && !promptDismissed && Notification.permission === 'default')
   }, [promptDismissed])
 

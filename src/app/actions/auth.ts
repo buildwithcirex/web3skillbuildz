@@ -41,6 +41,40 @@ export async function signUp(
   return { error: '', success: true }
 }
 
+export async function signInWithMagicLink(
+  prevState: { error: string; success: boolean },
+  formData: FormData
+) {
+  const supabase = await createClient()
+  const email = formData.get('email') as string
+
+  if (!email) {
+    return { error: 'Email is required.', success: false }
+  }
+
+  if (!email.toLowerCase().includes('@kccemsr.edu.in')) {
+    return { error: 'Please use your college email address.', success: false }
+  }
+
+  // Next.js headers API can sometimes be tricky for getting full origin depending on proxy, 
+  // but let's use the local URL for dev or process.env for prod
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: {
+      emailRedirectTo: `${siteUrl}/auth/callback`,
+    },
+  })
+
+  if (error) {
+    // If the database trigger rejects the signup, the error message will be surfaced here!
+    return { error: error.message, success: false }
+  }
+
+  return { error: '', success: true }
+}
+
 export async function signIn(
   prevState: { error: string; success: boolean },
   formData: FormData

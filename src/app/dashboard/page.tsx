@@ -25,20 +25,20 @@ export default async function DashboardPage() {
 
   if (!profile) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-        <div className="bg-white rounded-2xl border border-red-200 shadow-sm p-8 max-w-md text-center space-y-4">
-          <p className="text-red-600 font-semibold text-lg">⚠️ Could not load your profile</p>
-          <p className="text-sm text-gray-600">
+      <div className="min-h-screen flex items-center justify-center bg-stone-100 p-4">
+        <div className="bg-white rounded-none border-2 border-red-900 p-8 max-w-md text-center space-y-4">
+          <p className="text-red-700 font-bold font-mono text-lg uppercase">ERR: Profile Not Found</p>
+          <p className="text-sm text-stone-600">
             {profileError ? `Database error: ${profileError.message}` : 'Your account exists in Auth, but your record in the profiles table could not be found.'}
           </p>
           {profileError?.hint && (
-            <p className="text-xs text-gray-500 bg-gray-100 p-2 rounded">
+            <p className="text-xs text-stone-500 bg-stone-100 p-2 border-2 border-stone-200">
               Hint: {profileError.hint}
             </p>
           )}
           <div className="pt-2">
             <form action={signOut}>
-              <button type="submit" className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold transition">
+              <button type="submit" className="px-5 py-2.5 bg-stone-900 hover:bg-stone-800 text-white rounded-none text-sm font-bold font-mono uppercase transition border-2 border-stone-900">
                 Sign Out
               </button>
             </form>
@@ -66,109 +66,111 @@ export default async function DashboardPage() {
   const hasSubmitted = !!(typedTeam?.projectDescription && typedTeam?.deployLink && typedTeam?.screenshotUrl)
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-stone-100">
       <DashboardNav profileName={profile.name} activeTab="home" />
 
       <main className="max-w-5xl mx-auto px-6 py-10 space-y-8">
         {/* Welcome Banner */}
-        <div className="bg-gradient-to-r from-indigo-600 to-indigo-500 rounded-2xl p-8 text-white">
-          <p className="text-indigo-200 text-sm font-medium mb-1">Welcome back</p>
-          <h1 className="text-3xl font-bold mb-2">{profile.name}</h1>
-          <p className="text-indigo-100 text-sm">
+        <div className="bg-amber-400 border-2 border-stone-900 p-8 text-stone-900 rounded-none shadow-none">
+          <p className="text-stone-700 font-mono text-sm font-bold uppercase tracking-widest mb-1">Welcome back</p>
+          <h1 className="text-4xl font-bold font-mono uppercase tracking-tighter mb-2">{profile.name}</h1>
+          <p className="text-stone-800 text-sm font-medium">
             {hasSubmitted
-              ? "Your project has been submitted. Check back here for results."
+              ? "Project payload verified. Awaiting admin scoring."
               : isLocked
-              ? "Submissions are currently closed. Stay tuned for updates."
-              : "You haven't submitted your project yet. Head over to the Submission page to get started."}
+              ? "SUBMISSIONS LOCKED. Gateway closed."
+              : "SYSTEM READY. Awaiting project payload. Proceed to Submission."}
           </p>
         </div>
 
         {/* Status + Actions Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {/* Submission Status */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Submission Status</p>
+          <div className="bg-white border-2 border-stone-900 p-5 flex flex-col gap-3 rounded-none">
+            <p className="text-xs font-bold font-mono text-stone-900 uppercase tracking-widest">Submission</p>
             {hasSubmitted ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-green-100 text-green-800 w-fit">
-                <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 border-2 border-stone-900 text-sm font-bold bg-green-400 text-stone-900 w-fit uppercase font-mono">
+                <span className="w-2 h-2 bg-stone-900 inline-block rounded-none" />
                 Submitted
               </span>
             ) : isLocked ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-amber-100 text-amber-800 w-fit">
-                <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
-                Closed
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 border-2 border-stone-900 text-sm font-bold bg-red-400 text-stone-900 w-fit uppercase font-mono">
+                <span className="w-2 h-2 bg-stone-900 inline-block rounded-none" />
+                Locked
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800 w-fit">
-                <span className="w-2 h-2 rounded-full bg-yellow-500 inline-block" />
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 border-2 border-stone-900 text-sm font-bold bg-amber-200 text-stone-900 w-fit uppercase font-mono">
+                <span className="w-2 h-2 bg-stone-900 inline-block rounded-none animate-pulse" />
                 Pending
               </span>
             )}
             <Link
               href="/dashboard/submit"
-              className="mt-auto text-sm font-medium text-indigo-600 hover:text-indigo-700 transition"
+              className="mt-auto text-sm font-bold font-mono uppercase text-stone-900 hover:bg-stone-900 hover:text-white transition px-2 py-1 border-2 border-transparent hover:border-stone-900 w-fit"
             >
-              {hasSubmitted ? 'View / Edit →' : isLocked ? 'View details →' : 'Submit now →'}
+              {hasSubmitted ? '[ VIEW PAYLOAD ]' : isLocked ? '[ VIEW LOGS ]' : '[ INITIALIZE ]'}
             </Link>
           </div>
 
           {/* Results Status */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Results</p>
+          <div className="bg-white border-2 border-stone-900 p-5 flex flex-col gap-3 rounded-none">
+            <p className="text-xs font-bold font-mono text-stone-900 uppercase tracking-widest">Results</p>
             {isScoresPublished ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-blue-100 text-blue-800 w-fit">
-                <span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 border-2 border-stone-900 text-sm font-bold bg-blue-400 text-stone-900 w-fit uppercase font-mono">
+                <span className="w-2 h-2 bg-stone-900 inline-block rounded-none" />
                 Published
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-gray-100 text-gray-600 w-fit">
-                <span className="w-2 h-2 rounded-full bg-gray-400 inline-block" />
-                Not yet
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 border-2 border-stone-900 text-sm font-bold bg-stone-200 text-stone-600 w-fit uppercase font-mono">
+                <span className="w-2 h-2 bg-stone-600 inline-block rounded-none" />
+                Standby
               </span>
             )}
             <Link
               href="/dashboard/results"
-              className="mt-auto text-sm font-medium text-indigo-600 hover:text-indigo-700 transition"
+              className="mt-auto text-sm font-bold font-mono uppercase text-stone-900 hover:bg-stone-900 hover:text-white transition px-2 py-1 border-2 border-transparent hover:border-stone-900 w-fit"
             >
-              View results →
+              [ LEADERBOARD ]
             </Link>
           </div>
 
           {/* Event Info */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Event</p>
-            <p className="text-sm font-semibold text-gray-900">SkillBuildz Hackathon</p>
-            <p className="text-xs text-gray-400">
-              {isLocked ? 'Submissions have closed.' : 'Submissions are open.'}
+          <div className="bg-stone-900 text-white border-2 border-stone-900 p-5 flex flex-col gap-3 rounded-none">
+            <p className="text-xs font-bold font-mono text-amber-400 uppercase tracking-widest">Event Data</p>
+            <p className="text-lg font-bold font-mono uppercase">Web3 Builderthon</p>
+            <p className="text-xs text-stone-400 font-mono">
+              {isLocked ? 'GATE: CLOSED' : 'GATE: OPEN'}
             </p>
           </div>
         </div>
 
         {/* Profile Card */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-          <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Your Profile</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-white border-2 border-stone-900 p-6 rounded-none">
+          <h3 className="text-sm font-bold font-mono text-stone-900 uppercase tracking-widest mb-4 pb-2 border-b-2 border-stone-200">Operator Identity</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <div>
-              <p className="text-xs text-gray-400">Name</p>
-              <p className="font-medium text-gray-900">{profile.name}</p>
+              <p className="text-xs font-bold font-mono text-stone-500 uppercase mb-1">Name</p>
+              <p className="font-bold text-stone-900">{profile.name}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-400">Email</p>
-              <p className="font-medium text-gray-900">{profile.email}</p>
+              <p className="text-xs font-bold font-mono text-stone-500 uppercase mb-1">ID</p>
+              <p className="font-bold text-stone-900 font-mono">{profile.email}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-400">Phone</p>
-              <p className="font-medium text-gray-900">{profile.phone}</p>
+              <p className="text-xs font-bold font-mono text-stone-500 uppercase mb-1">Comm</p>
+              <p className="font-bold text-stone-900 font-mono">{profile.phone}</p>
             </div>
           </div>
         </div>
 
         {/* Team Section */}
-        <TeamSection
-          currentUserId={user.id}
-          team={typedTeam}
-          invitations={(myInvitations as MyInvitations | null) ?? { incoming: [], outgoing: [] }}
-        />
+        <div className="border-t-4 border-stone-900 pt-8 mt-8">
+          <TeamSection
+            currentUserId={user.id}
+            team={typedTeam}
+            invitations={(myInvitations as MyInvitations | null) ?? { incoming: [], outgoing: [] }}
+          />
+        </div>
       </main>
     </div>
   )
