@@ -21,10 +21,8 @@ export default async function AdminPage() {
     .eq('id', user.id)
     .single()
 
-  // Role-based guard: only admins allowed
   if (!adminProfile || adminProfile.role !== 'admin') redirect('/dashboard')
 
-  // Fetch lock status and scores published status
   const { data: config } = await supabase
     .from('event_config')
     .select('submissions_locked, scores_published, team_formation_locked')
@@ -48,33 +46,33 @@ export default async function AdminPage() {
   const totalReviewed = allTeams.filter(t => t.score !== null && t.score !== undefined).length
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-stone-100">
       {/* Nav */}
-      <header className="bg-white border-b border-gray-200 shadow-sm">
+      <header className="bg-white border-b-4 border-stone-900">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            <div className="w-8 h-8 bg-stone-900 border-2 border-stone-900 flex items-center justify-center rotate-[-2deg]">
+              <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                <path strokeLinecap="square" strokeLinejoin="miter" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
               </svg>
             </div>
             <div>
-              <span className="font-bold text-gray-900">SkillBuildz</span>
-              <span className="ml-2 text-xs font-semibold text-indigo-600 bg-indigo-50 border border-indigo-100 px-1.5 py-0.5 rounded">
-                Admin
+              <span className="font-bold font-mono text-stone-900 uppercase">SkillBuildz</span>
+              <span className="ml-2 text-xs font-bold font-mono text-amber-600 border-2 border-amber-600 bg-amber-100 px-1.5 py-0.5 uppercase">
+                SYS_ADMIN
               </span>
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600 hidden sm:block">
-              Organizer: <span className="font-semibold text-gray-900">{adminProfile.name}</span>
+            <span className="text-sm font-mono text-stone-600 hidden sm:block uppercase">
+              Organizer: <span className="font-bold text-stone-900">{adminProfile.name}</span>
             </span>
             <form action={signOut}>
               <button
                 type="submit"
-                className="text-sm font-medium text-gray-600 hover:text-red-600 transition px-3 py-1.5 rounded-lg hover:bg-red-50"
+                className="text-sm font-bold font-mono text-stone-900 hover:text-white transition px-4 py-2 hover:bg-red-500 border-2 border-stone-900 shadow-[2px_2px_0px_0px_#1c1917] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] uppercase"
               >
-                Sign Out
+                Terminate
               </button>
             </form>
           </div>
@@ -83,10 +81,10 @@ export default async function AdminPage() {
 
       <main className="max-w-7xl mx-auto px-6 py-10 space-y-8">
         {/* Title + Action Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-4 bg-amber-400 p-6 border-2 border-stone-900 shadow-[8px_8px_0px_0px_#1c1917]">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Event Controls & Participants</h2>
-            <p className="text-sm text-gray-500 mt-1">
+            <h2 className="text-2xl font-bold font-mono text-stone-900 uppercase tracking-tighter">Event Controls & Telemetry</h2>
+            <p className="text-sm font-medium text-stone-800 mt-1">
               Control submission window, review projects, assign scores, and publish results to participants.
             </p>
           </div>
@@ -98,29 +96,29 @@ export default async function AdminPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Total Participants</p>
-            <p className="text-3xl font-bold text-gray-900">{allProfiles.length}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
+          <div className="bg-white border-2 border-stone-900 shadow-[4px_4px_0px_0px_#1c1917] p-5 rounded-none">
+            <p className="text-xs font-bold font-mono text-stone-900 uppercase tracking-widest mb-1">Total Users</p>
+            <p className="text-4xl font-bold font-mono text-stone-900">{allProfiles.length}</p>
           </div>
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Teams Submitted</p>
-            <p className="text-3xl font-bold text-indigo-600">{totalSubmissions} / {allTeams.length}</p>
+          <div className="bg-white border-2 border-stone-900 shadow-[4px_4px_0px_0px_#1c1917] p-5 rounded-none">
+            <p className="text-xs font-bold font-mono text-stone-900 uppercase tracking-widest mb-1">Teams Submitted</p>
+            <p className="text-4xl font-bold font-mono text-blue-600">{totalSubmissions} / {allTeams.length}</p>
           </div>
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Teams Reviewed & Scored</p>
-            <p className="text-3xl font-bold text-purple-600">{totalReviewed} / {allTeams.length}</p>
+          <div className="bg-white border-2 border-stone-900 shadow-[4px_4px_0px_0px_#1c1917] p-5 rounded-none">
+            <p className="text-xs font-bold font-mono text-stone-900 uppercase tracking-widest mb-1">Teams Scored</p>
+            <p className="text-4xl font-bold font-mono text-purple-600">{totalReviewed} / {allTeams.length}</p>
           </div>
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Results Visibility</p>
+          <div className="bg-stone-900 border-2 border-stone-900 shadow-[4px_4px_0px_0px_#fde047] p-5 rounded-none text-white">
+            <p className="text-xs font-bold font-mono text-amber-400 uppercase tracking-widest mb-1">Results Status</p>
             <div className="mt-1">
               {isScoresPublished ? (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800">
-                  ✅ Scores Live to Users
+                <span className="inline-flex items-center gap-2 px-3 py-1 text-xs font-bold font-mono bg-blue-400 text-stone-900 border-2 border-stone-900 uppercase">
+                  [ LIVE TO USERS ]
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700">
-                  🔒 Scores Hidden from Users
+                <span className="inline-flex items-center gap-2 px-3 py-1 text-xs font-bold font-mono bg-stone-200 text-stone-800 border-2 border-stone-900 uppercase">
+                  [ HIDDEN ]
                 </span>
               )}
             </div>
@@ -128,21 +126,28 @@ export default async function AdminPage() {
         </div>
 
         {error && (
-          <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
-            Error loading participants: {error.message}
+          <div className="text-sm font-bold font-mono text-red-900 bg-red-100 border-2 border-red-900 rounded-none px-4 py-3 uppercase">
+            ERR LOADING PROFILES: {error.message}
           </div>
         )}
         {teamsError && (
-          <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
-            Error loading teams: {teamsError.message}
+          <div className="text-sm font-bold font-mono text-red-900 bg-red-100 border-2 border-red-900 rounded-none px-4 py-3 uppercase">
+            ERR LOADING TEAMS: {teamsError.message}
+            <div className="mt-2 text-xs font-normal">
+              Did you forget to run the team_system_schema.sql script in your Supabase SQL editor?
+            </div>
           </div>
         )}
 
         {/* Teams */}
-        <TeamsPanel teams={allTeams} />
+        <div className="border-t-4 border-stone-900 pt-8 mt-8">
+          <TeamsPanel teams={allTeams} />
+        </div>
 
         {/* Participants (account management) */}
-        <ParticipantsTable profiles={allProfiles} />
+        <div className="border-t-4 border-stone-900 pt-8 mt-8">
+          <ParticipantsTable profiles={allProfiles} />
+        </div>
       </main>
     </div>
   )
