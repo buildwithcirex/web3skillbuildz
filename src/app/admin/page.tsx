@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+export const dynamic = 'force-dynamic'
 import { redirect } from 'next/navigation'
 import { signOut } from '@/app/actions/auth'
 import ParticipantsTable from './_components/ParticipantsTable'
