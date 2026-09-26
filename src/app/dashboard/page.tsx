@@ -84,7 +84,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Status + Actions Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Submission Status */}
           <div className="bg-white border-2 border-stone-900 p-5 flex flex-col gap-3 rounded-none">
             <p className="text-xs font-bold font-mono text-stone-900 uppercase tracking-widest">Submission</p>
@@ -137,7 +137,7 @@ export default async function DashboardPage() {
           {/* Event Info */}
           <div className="bg-stone-900 text-white border-2 border-stone-900 p-5 flex flex-col gap-3 rounded-none">
             <p className="text-xs font-bold font-mono text-amber-400 uppercase tracking-widest">Event Data</p>
-            <p className="text-lg font-bold font-mono uppercase">Web3 Builderthon</p>
+            <p className="text-lg font-bold font-mono uppercase">WEB3SKILLBUILDZ</p>
             <p className="text-xs text-stone-400 font-mono">
               {isLocked ? 'GATE: CLOSED' : 'GATE: OPEN'}
             </p>
@@ -147,18 +147,18 @@ export default async function DashboardPage() {
         {/* Profile Card */}
         <div className="bg-white border-2 border-stone-900 p-6 rounded-none">
           <h3 className="text-sm font-bold font-mono text-stone-900 uppercase tracking-widest mb-4 pb-2 border-b-2 border-stone-200">Operator Identity</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <p className="text-xs font-bold font-mono text-stone-500 uppercase mb-1">Name</p>
               <p className="font-bold text-stone-900">{profile.name}</p>
             </div>
             <div>
               <p className="text-xs font-bold font-mono text-stone-500 uppercase mb-1">ID</p>
-              <p className="font-bold text-stone-900 font-mono">{profile.email}</p>
+              <p className="font-bold text-stone-900 font-mono break-all">{profile.email}</p>
             </div>
             <div>
               <p className="text-xs font-bold font-mono text-stone-500 uppercase mb-1">Comm</p>
-              <p className="font-bold text-stone-900 font-mono">{profile.phone}</p>
+              <p className="font-bold text-stone-900 font-mono break-all">{profile.phone}</p>
             </div>
           </div>
         </div>

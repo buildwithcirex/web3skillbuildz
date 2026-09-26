@@ -72,67 +72,73 @@ export default function UserSearchPanel() {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+    <div className="bg-white rounded-none border-2 border-stone-900 p-6 space-y-4 relative">
+      {/* Decorative corners */}
+      <div className="absolute top-0 left-0 w-2 h-2 bg-stone-900" />
+      <div className="absolute top-0 right-0 w-2 h-2 bg-stone-900" />
+      <div className="absolute bottom-0 left-0 w-2 h-2 bg-stone-900" />
+      <div className="absolute bottom-0 right-0 w-2 h-2 bg-stone-900" />
+
       <div>
-        <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-          <UserPlus className="w-4 h-4 text-indigo-600" /> Invite Teammates
+        <h3 className="text-sm font-bold font-mono text-stone-900 uppercase flex items-center gap-2">
+          <UserPlus className="w-4 h-4 text-stone-900" /> Invite Teammates
         </h3>
-        <p className="text-xs text-gray-400 mt-0.5">Search participants and send a team invitation.</p>
+        <p className="text-xs font-mono font-bold text-stone-500 mt-1 uppercase">Search participants and send a team invitation.</p>
       </div>
 
       <div className="relative">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-500" />
         <input
           type="text"
           value={query}
           onChange={e => setQuery(e.target.value)}
-          placeholder="Search by name or email..."
-          className="w-full pl-10 pr-10 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
+          placeholder="SEARCH BY NAME OR EMAIL..."
+          className="w-full pl-10 pr-10 py-3 text-sm font-mono font-bold uppercase text-stone-900 placeholder:text-stone-400 bg-white border-2 border-stone-900 rounded-none focus:outline-none focus:ring-0 focus:border-amber-400 transition"
         />
         {query && (
           <button
             onClick={() => setQuery('')}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-900 transition"
           >
             <X className="w-4 h-4" />
           </button>
         )}
       </div>
 
-      {error && <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3">{error}</p>}
+      {error && <p className="text-sm font-bold font-mono uppercase text-red-900 bg-red-100 border-2 border-red-900 px-4 py-3">{error}</p>}
 
-      <ul className="divide-y divide-gray-50 max-h-80 overflow-y-auto">
+      <ul className="divide-y-2 divide-stone-100 max-h-80 overflow-y-auto">
         {loading ? (
-          <li className="text-sm text-gray-400 text-center py-6">Searching…</li>
+          <li className="text-sm font-mono font-bold text-stone-400 uppercase text-center py-6">Searching...</li>
         ) : results.length === 0 ? (
-          <li className="text-sm text-gray-400 text-center py-6">No participants found.</li>
+          <li className="text-sm font-mono font-bold text-stone-400 uppercase text-center py-6">No participants found.</li>
         ) : (
           results.map(candidate => {
             const remainingMs = Math.max(0, (cooldownUntil[candidate.id] ?? 0) - nowTick)
             const onCooldown = remainingMs > 0 && candidate.status === 'available'
 
             return (
-              <li key={candidate.id} className="flex items-center justify-between gap-3 py-3">
+              <li key={candidate.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-4">
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">{candidate.name}</p>
-                  <p className="text-xs text-gray-400 truncate">{candidate.email}</p>
+                  <p className="text-sm font-bold font-mono uppercase text-stone-900 truncate">{candidate.name}</p>
+                  <p className="text-xs font-mono font-medium text-stone-500 truncate">{candidate.email}</p>
                 </div>
 
                 {candidate.status === 'already_in_team' ? (
                   <Badge tone="green">Already in Team</Badge>
                 ) : candidate.status === 'already_in_other_team' ? (
-                  <Badge tone="gray">Already in Another Team</Badge>
+                  <Badge tone="gray">In Another Team</Badge>
                 ) : candidate.status === 'request_sent' ? (
-                  <Badge tone="indigo">Request Sent</Badge>
+                  <Badge tone="amber">Request Sent</Badge>
                 ) : onCooldown ? (
                   <Badge tone="amber">Wait {Math.ceil(remainingMs / 1000)}s</Badge>
                 ) : (
                   <button
                     onClick={() => handleInvite(candidate)}
                     disabled={sendingId === candidate.id}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-xs font-semibold transition whitespace-nowrap"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 text-stone-900 border-2 border-stone-900 bg-amber-400 hover:bg-amber-300 disabled:opacity-50 text-xs font-bold font-mono uppercase transition shadow-[4px_4px_0px_0px_#1c1917] active:shadow-none active:translate-y-[4px] active:translate-x-[4px]"
                   >
-                    {sendingId === candidate.id ? 'Sending…' : 'Send Request'}
+                    {sendingId === candidate.id ? 'Sending...' : 'Send Request'}
                   </button>
                 )}
               </li>

@@ -34,32 +34,38 @@ export default function PendingInvitationsPanel({
   if (incoming.length === 0 && outgoing.length === 0) return null
 
   return (
-    <div id="team-requests" className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5 scroll-mt-24">
+    <div id="team-requests" className="bg-white rounded-none border-2 border-stone-900 p-6 space-y-5 scroll-mt-24 relative">
+      {/* Decorative corners */}
+      <div className="absolute top-0 left-0 w-2 h-2 bg-stone-900" />
+      <div className="absolute top-0 right-0 w-2 h-2 bg-stone-900" />
+      <div className="absolute bottom-0 left-0 w-2 h-2 bg-stone-900" />
+      <div className="absolute bottom-0 right-0 w-2 h-2 bg-stone-900" />
+
       <div>
-        <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-          <Mail className="w-4 h-4 text-indigo-600" /> Team Invitations
+        <h3 className="text-sm font-bold font-mono uppercase text-stone-900 flex items-center gap-2">
+          <Mail className="w-4 h-4 text-stone-900" /> Team Invitations
         </h3>
       </div>
 
-      {error && <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3">{error}</p>}
+      {error && <p className="text-sm font-bold font-mono uppercase text-red-900 bg-red-100 border-2 border-red-900 px-4 py-3">{error}</p>}
 
       {incoming.length > 0 && (
         <div className="space-y-3">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Received</p>
-          <ul className="divide-y divide-gray-50">
+          <p className="text-xs font-bold font-mono text-stone-500 uppercase tracking-widest">Received</p>
+          <ul className="divide-y-2 divide-stone-200 border-t-2 border-b-2 border-stone-200">
             {incoming.map(invite => (
-              <li key={invite.id} className="flex items-center justify-between gap-3 py-3">
+              <li key={invite.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4">
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">
-                    <span className="font-semibold">{invite.senderName}</span> invited you to join{' '}
-                    <span className="font-semibold">{invite.teamName}</span>
+                  <p className="text-sm font-mono text-stone-900 uppercase">
+                    <span className="font-bold text-amber-600">{invite.senderName}</span> INVITED YOU TO JOIN{' '}
+                    <span className="font-bold text-amber-600">{invite.teamName}</span>
                   </p>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
                   <button
                     onClick={() => handleAccept(invite.id)}
                     disabled={respondingId === invite.id}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-xs font-semibold transition"
+                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2 border-2 border-stone-900 text-stone-900 bg-amber-400 hover:bg-amber-300 disabled:opacity-50 text-xs font-bold font-mono uppercase transition shadow-[2px_2px_0px_0px_#1c1917] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
                   >
                     <Check className="w-3.5 h-3.5" />
                     Accept
@@ -67,7 +73,7 @@ export default function PendingInvitationsPanel({
                   <button
                     onClick={() => handleDecline(invite.id)}
                     disabled={respondingId === invite.id}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-gray-700 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-xs font-semibold transition"
+                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2 border-2 border-stone-900 text-stone-900 bg-stone-200 hover:bg-stone-300 disabled:opacity-50 text-xs font-bold font-mono uppercase transition shadow-[2px_2px_0px_0px_#1c1917] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
                   >
                     <X className="w-3.5 h-3.5" />
                     Decline
@@ -81,13 +87,13 @@ export default function PendingInvitationsPanel({
 
       {outgoing.length > 0 && (
         <div className="space-y-3">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Sent by Your Team</p>
-          <ul className="divide-y divide-gray-50">
+          <p className="text-xs font-bold font-mono text-stone-500 uppercase tracking-widest">Sent by Your Team</p>
+          <ul className="divide-y-2 divide-stone-200 border-t-2 border-b-2 border-stone-200">
             {outgoing.map(invite => (
-              <li key={invite.id} className="flex items-center justify-between gap-3 py-3">
-                <p className="text-sm text-gray-700">{invite.recipientName}</p>
-                <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 bg-amber-100 px-2.5 py-1 rounded-full">
-                  <Clock className="w-3 h-3" /> Pending
+              <li key={invite.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-4">
+                <p className="text-sm font-bold font-mono uppercase text-stone-900">{invite.recipientName}</p>
+                <span className="inline-flex items-center justify-center sm:justify-start gap-1.5 text-xs font-bold font-mono uppercase text-stone-900 bg-stone-200 border-2 border-stone-900 px-3 py-1.5">
+                  <Clock className="w-3.5 h-3.5" /> Pending
                 </span>
               </li>
             ))}

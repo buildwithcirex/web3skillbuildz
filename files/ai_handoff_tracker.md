@@ -6,14 +6,14 @@ Whenever a new chat session begins, read this file first to understand the curre
 
 ---
 
-## 📍 Project Status Overview
+## Project Status Overview
 - **Current Phase:** Phase 9 — UI/UX Overhaul & Web3 Builderthon Aesthetic
-- **Last Updated:** 2026-09-26T19:26:00+05:30
-- **Current Blocker/Notes:** The user deployed the app but noticed the UI looked the same on the `/admin` page. This was because the admin page hadn't been updated yet. We have now fully overhauled the `layout.tsx`, `globals.css`, `page.tsx`, `LoginForm.tsx`, `dashboard/page.tsx`, `DashboardNav.tsx`, and `admin/page.tsx` to a strict **Neo-Brutalist Web3 Builderthon** aesthetic (no gradients, sharp corners, flat shadows, monospace fonts). A global system rule (`30-web-design-reasons.md`) was added to `~/.gemini/config/rules/` to strictly enforce "anti-slop" design choices across all future agents. The user must run the `team_system_schema.sql` script in Supabase to fix the `admin_list_teams` RPC error and then push the git commits to see the UI updates on Vercel.
+- **Last Updated:** 2026-09-26T20:33:00+05:30
+- **Current Blocker/Notes:** The user successfully tested the team functionality. We noticed the UI on mobile was squeezed and overflowing due to improper grid settings (`sm:grid-cols-3`), missing text-wrapping on emails, and the Team components inside `/dashboard` still retaining the old generic rounded-UI look. We have completely overhauled `TeamSection.tsx`, `TeamOverviewCard.tsx`, `CreateTeamPrompt.tsx`, `UserSearchPanel.tsx`, and `PendingInvitationsPanel.tsx` to match the Neo-Brutalist (WEB3SKILLBUILDZ) aesthetic. Furthermore, we upgraded `useTeamNotifications.ts` to trigger a `router.refresh()` automatically whenever a database notification arrives, and supplied the user with updated RPCs (`leave_team`, `remove_team_member`, `accept_team_invitation`, `decline_team_invitation`) to generate real-time `team_alert` notifications for all major team interactions.
 
 ---
 
-## ✅ Completed Tasks
+## Completed Tasks
 *(Move items here once fully implemented and tested)*
 - [x] Initial project documentation and architecture planning curated.
 - [x] Read all `.md` specification files to understand the project scope.
@@ -26,43 +26,45 @@ Whenever a new chat session begins, read this file first to understand the curre
 - [x] Split dashboard into home page (`/dashboard`) and submission page (`/dashboard/submit`).
 - [x] Moved submission + scoring from `profiles` to `teams` (team-level, not individual).
 - [x] Added team locking logic and RPCs.
-- [x] **[NEW]** Setup Global AI Design Rules (`~/.gemini/config/rules/30-web-design-reasons.md`).
-- [x] **[NEW]** Overhauled UI to Neo-Brutalist Web3 theme (IBM Plex Mono/Sans, Stone/Charcoal palette, sharp edges).
-- [x] **[NEW]** Rewrote `/admin` layout to match the new SYS_ADMIN aesthetic.
-- [x] **Production build passes with zero errors; `npm test` passes.**
+- [x] Setup Global AI Design Rules (`~/.gemini/config/rules/30-web-design-reasons.md`).
+- [x] Overhauled UI to Neo-Brutalist Web3 theme (IBM Plex Mono/Sans, Stone/Charcoal palette, sharp edges).
+- [x] Rewrote `/admin` layout to match the new SYS_ADMIN aesthetic.
+- [x] Updated the `DashboardNav` and `page.tsx` grids to be fully responsive on mobile.
+- [x] Changed the dashboard event name string to "WEB3SKILLBUILDZ".
+- [x] Applied the Neo-Brutalist styling to the inner `TeamSection` and its sub-components (PendingInvitations, UserSearch, TeamOverview, etc).
+- [x] Set up Real-Time UI auto-refreshing via `useTeamNotifications` and updated SQL notification logic.
 
 ---
 
-## ⏳ In Progress
+## In Progress
 *(Move the currently active task here)*
-- [-] User testing participant flow using the Gmail '+' trick and validating the new Leave/Disband Team features.
+- [-] User is executing the final SQL scripts in Supabase to wire up the real-time notification events for team actions (leave, kick, accept, decline) and testing the mobile responsive layout.
 
 ---
 
-## 📋 Pending Backlog (To-Do)
+## Pending Backlog (To-Do)
 
 ### Phase 2: Database & Auth Setup (Supabase) — USER MUST DO MANUALLY
-- [x] Run the full `files/team_system_schema.sql` in the Supabase SQL editor (Pending user action to resolve `admin_list_teams` cache error).
+- [x] Run the full `files/team_system_schema.sql` in the Supabase SQL editor.
 - [x] Setup the `allowed_emails` table and the `enforce_allowed_emails` trigger.
 - [x] Create the `project_screenshots` public storage bucket in Supabase dashboard.
-- [x] Apply RLS policies for the `profiles` table and storage bucket (see `files/security_protocols.md`).
-- [x] **[NEW]** Setup custom SMTP using Google Workspace app password to bypass Supabase rate limits.
-- [x] **[NEW]** Added a 60-second cooldown timer to the magic link login UI.
-- [x] **[NEW]** Corrected database `handle_new_user` trigger to fetch missing `name` and `phone` values from the `allowed_emails` table.
-- [x] **[NEW]** Corrected `delete_user_completely` RPC to also purge users from the `allowed_emails` whitelist on deletion.
-- [x] **[NEW]** Fixed team leadership bug: UI and DB now correctly promote team creator to `leader` ONLY after their first outgoing invitation is accepted.
-- [x] **[NEW]** Added "Leave Team" / "Disband Team" logic to Next.js actions and `TeamOverviewCard.tsx`. Created `leave_team` RPC.
+- [x] Apply RLS policies for the `profiles` table and storage bucket.
+- [x] Setup custom SMTP using Google Workspace app password to bypass Supabase rate limits.
+- [x] Added a 60-second cooldown timer to the magic link login UI.
+- [x] Corrected database `handle_new_user` trigger to fetch missing `name` and `phone` values from the `allowed_emails` table.
+- [x] Corrected `delete_user_completely` RPC to also purge users from the `allowed_emails` whitelist on deletion.
+- [x] Fixed team leadership bug: UI and DB now correctly promote team creator to `leader` ONLY after their first outgoing invitation is accepted.
+- [x] Added "Leave Team" / "Disband Team" logic to Next.js actions and `TeamOverviewCard.tsx`. Created `leave_team` RPC.
 
 ### Phase 6: Final Polish
 - [ ] Handle loading states and error handling across all forms.
-- [ ] Apply the Neo-Brutalist styling to the inner `TeamSection` and `ParticipantsTable` components.
+- [ ] Apply the Neo-Brutalist styling to the `ParticipantsTable` components (Admin side).
 
 ---
 
-## 🧠 Context & Quirks
-*(AI: Log any specific architectural decisions, workarounds, or bugs you encounter here so you don't forget them in the next session.)*
+## Context & Quirks
 - **Design System Enforcement:** The user explicitly hates generic AI SaaS design (slop). A strict rule exists in `~/.gemini/config/rules/30-web-design-reasons.md`. DO NOT use `rounded-2xl`, soft shadows, purple/blue gradients, Lucide icons, or `Geist`/`Inter` fonts. Default to sharp edges, hard flat shadows (`shadow-[4px_4px_0px_0px_#1c1917]`), flat borders, and `IBM Plex` typography.
-- **Role Assignment:** Remember, users NEVER choose their role. The database trigger handles it based on the hardcoded trigger logic. The admin email is explicitly whitelisted in the auth trigger (`ce25.rushabh.makwana@kccemsr.edu.in`).
+- **Role Assignment:** Remember, users NEVER choose their role. The database trigger handles it based on the hardcoded trigger logic. The admin email is explicitly whitelisted in the auth trigger.
 - **Auth Strategy (Phase 8 Change):** No passwords! The app relies entirely on `supabase.auth.signInWithOtp()`. The frontend callback `auth/callback/route.ts` handles the session.
 - **Whitelist Security:** The Google Apps Script bypasses RLS using the Supabase `service_role` key to populate `allowed_emails`. Signups are hard-blocked by a Postgres trigger on `auth.users` before insertion.
 - **Data Fetching:** Use Server Components for initial fetching and Server Actions for mutations.

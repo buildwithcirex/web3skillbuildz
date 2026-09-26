@@ -22,15 +22,15 @@ export default function TeamSection({
 
   return (
     <section className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-gray-900">Team</h2>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h2 className="text-xl font-bold font-mono uppercase text-stone-900 border-l-4 border-amber-400 pl-3">Team Configuration</h2>
         {showPrompt && (
           <button
             onClick={() => void requestPermission()}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition"
+            className="inline-flex w-fit items-center gap-1.5 px-3 py-1.5 border-2 border-stone-900 bg-amber-400 text-stone-900 text-xs font-bold font-mono uppercase shadow-[2px_2px_0px_0px_#1c1917] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition"
           >
             <Bell className="w-3.5 h-3.5" />
-            Enable notifications for team invites
+            Enable Alerts
           </button>
         )}
       </div>
@@ -41,8 +41,8 @@ export default function TeamSection({
         <>
           <TeamOverviewCard team={team} currentUserId={currentUserId} />
           {(team.isLeader || team.leaderId === currentUserId) && !team.isLocked && (isFull ? (
-            <p className="text-sm text-gray-500 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
-              Your team is full. Remove a member to invite someone new.
+            <p className="text-sm font-bold font-mono text-amber-900 bg-amber-100 border-2 border-amber-900 px-4 py-3 uppercase">
+              WARNING: Team capacity reached. Remove a member to free up a slot.
             </p>
           ) : (
             <UserSearchPanel />

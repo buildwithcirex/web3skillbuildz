@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
 
 interface NotificationRow {
   id: string
@@ -34,6 +35,7 @@ function notifyBrowser(message: string) {
 // table (files/team_system_schema.sql) — one row, one INSERT event, one
 // browser notification per invitation.
 export function useTeamNotifications(userId: string) {
+  const router = useRouter()
   // Whether to show the "enable notifications" prompt. We don't track the
   // live Notification.permission value in state (reading it only makes
   // sense as a one-off, gesture-triggered action) — we just hide the
@@ -59,7 +61,9 @@ export function useTeamNotifications(userId: string) {
         { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${userId}` },
         payload => {
           const row = payload.new as NotificationRow
-          if (row.type === 'team_invitation') notifyBrowser(row.message)
+          notifyBrowser(row.message)
+          // Automatically refresh the Next.js router to grab fresh data (invites, team members)
+          router.refresh()
         }
       )
       .subscribe()
