@@ -121,3 +121,30 @@ export async function lockTeam(): Promise<ActionResult> {
   revalidatePath('/dashboard/submit')
   return { error: null }
 }
+
+export async function leaveTeam(): Promise<ActionResult> {
+  const { supabase, user } = await getAuthedClient()
+
+  // 1. If this person is the leader, we should clean up their team's screenshot
+  // from storage before disbanding the team (which will be handled by the RPC).
+  const { data: teamData } = await supabase.rpc('get_my_team')
+  if (teamData?.isLeader && teamData.screenshotUrl) {
+    try {
+      const parts = teamData.screenshotUrl.split('/project_screenshots/')
+      if (parts.length > 1) {
+        const filePath = decodeURIComponent(parts[1])
+        await supabase.storage.from('project_screenshots').remove([filePath])
+      }
+    } catch (err) {
+      console.error('Error removing screenshot during leaveTeam:', err)
+    }
+  }
+
+  // 2. Call the RPC to actually leave the team (or disband it)
+  const { error } = await supabase.rpc('leave_team')
+  if (error) return { error: toUserMessage(error.message) }
+
+  revalidatePath('/dashboard')
+  revalidatePath('/dashboard/submit')
+  return { error: null }
+}

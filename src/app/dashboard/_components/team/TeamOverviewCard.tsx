@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Crown, Trash2, Users, Lock, Unlock } from 'lucide-react'
-import { removeTeamMember, lockTeam } from '@/app/actions/team'
+import { Crown, Trash2, Users, Lock, Unlock, LogOut } from 'lucide-react'
+import { removeTeamMember, lockTeam, leaveTeam } from '@/app/actions/team'
 import type { Team, TeamMember } from '@/lib/team/types'
 
 export default function TeamOverviewCard({ team, currentUserId }: { team: Team; currentUserId: string }) {
@@ -11,6 +11,8 @@ export default function TeamOverviewCard({ team, currentUserId }: { team: Team; 
   const [error, setError] = useState<string | null>(null)
   const [locking, setLocking] = useState(false)
   const [lockError, setLockError] = useState<string | null>(null)
+  const [leaving, setLeaving] = useState(false)
+  const [leaveError, setLeaveError] = useState<string | null>(null)
 
   const handleRemove = async () => {
     if (!removeTarget) return
@@ -23,6 +25,17 @@ export default function TeamOverviewCard({ team, currentUserId }: { team: Team; 
     } else {
       setRemoveTarget(null)
     }
+  }
+
+  const handleLeave = async () => {
+    if (!confirm(team.isLeader ? 'Are you sure you want to leave? Because you are the leader, this will disband the entire team for everyone.' : 'Are you sure you want to leave this team?')) {
+      return
+    }
+    setLeaving(true)
+    setLeaveError(null)
+    const result = await leaveTeam()
+    setLeaving(false)
+    if (result?.error) setLeaveError(result.error)
   }
 
   const handleLock = async () => {
@@ -110,11 +123,27 @@ export default function TeamOverviewCard({ team, currentUserId }: { team: Team; 
           )}
           <button
             onClick={handleLock}
-            disabled={locking}
+            disabled={locking || leaving}
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white text-xs font-bold transition shadow-xs"
           >
             <Lock className="w-3.5 h-3.5" />
             {locking ? 'Locking…' : 'Lock My Team'}
+          </button>
+        </div>
+      )}
+
+      {!team.isLocked && (
+        <div className="pt-2 border-t border-gray-100 space-y-2">
+          {leaveError && (
+            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{leaveError}</p>
+          )}
+          <button
+            onClick={handleLeave}
+            disabled={leaving || locking}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 disabled:opacity-50 text-xs font-bold transition shadow-xs"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            {leaving ? 'Leaving...' : team.isLeader ? 'Disband Team' : 'Leave Team'}
           </button>
         </div>
       )}

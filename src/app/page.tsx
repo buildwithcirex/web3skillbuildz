@@ -29,7 +29,7 @@ export default async function HomePage() {
             </svg>
           </div>
           <h1 className="text-3xl font-bold font-mono tracking-tighter uppercase text-stone-900">
-            Web3 Builderthon
+            WEB3SKILLBUILDZ
           </h1>
           <p className="text-stone-600 mt-2 font-medium">Build. Submit. Compete.</p>
         </div>

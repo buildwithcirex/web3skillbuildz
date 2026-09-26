@@ -72,7 +72,7 @@ export async function signInWithMagicLink(
     return { error: error.message, success: false }
   }
 
-  return { error: '', success: true }
+  return { error: '', success: true, timestamp: Date.now() }
 }
 
 export async function signIn(

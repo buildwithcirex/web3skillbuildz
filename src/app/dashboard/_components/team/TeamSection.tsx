@@ -40,7 +40,7 @@ export default function TeamSection({
       {team ? (
         <>
           <TeamOverviewCard team={team} currentUserId={currentUserId} />
-          {team.isLeader && !team.isLocked && (isFull ? (
+          {(team.isLeader || team.leaderId === currentUserId) && !team.isLocked && (isFull ? (
             <p className="text-sm text-gray-500 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
               Your team is full. Remove a member to invite someone new.
             </p>

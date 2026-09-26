@@ -25,8 +25,7 @@ export default function CreateTeamPrompt() {
         </div>
         <h3 className="text-lg font-bold text-gray-900">Build Your Team</h3>
         <p className="text-sm text-gray-500 max-w-sm">
-          Create a team of up to {MAX_TEAM_SIZE} people. You&apos;ll be the team leader and can invite
-          others to join.
+          Create a team of up to {MAX_TEAM_SIZE} people. The person who sends an invite that gets accepted first will become the team leader.
         </p>
         {error && (
           <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3 w-full">

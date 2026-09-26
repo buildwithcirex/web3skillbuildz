@@ -6,10 +6,10 @@ Whenever a new chat session begins, read this file first to understand the curre
 
 ---
 
-## 📅 Project Status Overview
-- **Current Phase:** Phase 8 — Authentication Overhaul & Pre-Registration Sync
-- **Last Updated:** 2026-09-26T15:05:00+05:30
-- **Current Blocker/Notes:** We completely removed the Registration flow and switched to Passwordless Magic Link (OTP) authentication. Only students with a college email (`ce*@kccemsr.edu.in`) who have pre-registered via a Google Form are allowed to log in. We built a Google Apps Script that syncs form responses to a new `allowed_emails` table in Supabase. A `BEFORE INSERT` Postgres trigger on `auth.users` blocks unauthorized signups. The admin dashboard had a "red error" related to a missing RPC (`admin_list_teams`), which the user resolved by manually applying the latest `team_system_schema.sql` in the Supabase SQL editor. Vercel deployment issues caused by corrupted `.next` cache and missing environment variables have also been addressed.
+## 📍 Project Status Overview
+- **Current Phase:** Phase 9 — UI/UX Overhaul & Web3 Builderthon Aesthetic
+- **Last Updated:** 2026-09-26T19:26:00+05:30
+- **Current Blocker/Notes:** The user deployed the app but noticed the UI looked the same on the `/admin` page. This was because the admin page hadn't been updated yet. We have now fully overhauled the `layout.tsx`, `globals.css`, `page.tsx`, `LoginForm.tsx`, `dashboard/page.tsx`, `DashboardNav.tsx`, and `admin/page.tsx` to a strict **Neo-Brutalist Web3 Builderthon** aesthetic (no gradients, sharp corners, flat shadows, monospace fonts). A global system rule (`30-web-design-reasons.md`) was added to `~/.gemini/config/rules/` to strictly enforce "anti-slop" design choices across all future agents. The user must run the `team_system_schema.sql` script in Supabase to fix the `admin_list_teams` RPC error and then push the git commits to see the UI updates on Vercel.
 
 ---
 
@@ -18,55 +18,52 @@ Whenever a new chat session begins, read this file first to understand the curre
 - [x] Initial project documentation and architecture planning curated.
 - [x] Read all `.md` specification files to understand the project scope.
 - [x] Initialize Next.js App Router project with Tailwind CSS.
-- [x] Install dependencies: `@supabase/supabase-js`, `@supabase/ssr`, `lucide-react`.
-- [x] Configure environment variables (`.env.local` with placeholders — user needs to fill in real values).
+- [x] Configure environment variables (`.env.local`).
 - [x] Create `src/proxy.ts` — route protection and role-based redirection.
-- [x] Create `src/app/auth/callback/route.ts` — Supabase auth callback route handler.
-- [x] **[NEW]** Migrated login entirely to Passwordless Magic Links (OTP).
-- [x] **[NEW]** Removed `RegisterForm.tsx` tab from the frontend.
-- [x] **[NEW]** Added `signInWithMagicLink` server action in `src/app/actions/auth.ts`.
-- [x] **[NEW]** Setup automated Google Form -> Supabase sync using Google Apps Script.
-- [x] **[NEW]** Implemented database-level signup blocking (Postgres Trigger on `auth.users`) to enforce college email format and whitelist check against `allowed_emails` table.
-- [x] Fixed ESLint `react-hooks/set-state-in-effect` issue in `useTeamNotifications.ts`.
-- [x] Addressed Vercel deployment `500 Internal Server Error` (corrupted build cache & missing env vars).
-- [x] Split dashboard into home page (`/dashboard`) and submission page (`/dashboard/submit`); extracted `DashboardNav` shared component.
+- [x] Migrated login entirely to Passwordless Magic Links (OTP).
+- [x] Setup automated Google Form -> Supabase sync using Google Apps Script.
+- [x] Implemented database-level signup blocking (Postgres Trigger on `auth.users`).
+- [x] Split dashboard into home page (`/dashboard`) and submission page (`/dashboard/submit`).
 - [x] Moved submission + scoring from `profiles` to `teams` (team-level, not individual).
-- [x] Added team locking: `lock_team()` (leader self-lock), `unlock_team()` (admin), `set_team_formation_lock()` (admin global force-lock).
-- [x] New public leaderboard: `src/app/dashboard/results/page.tsx` + `Podium.tsx` + `LeaderboardList.tsx`.
+- [x] Added team locking logic and RPCs.
+- [x] **[NEW]** Setup Global AI Design Rules (`~/.gemini/config/rules/30-web-design-reasons.md`).
+- [x] **[NEW]** Overhauled UI to Neo-Brutalist Web3 theme (IBM Plex Mono/Sans, Stone/Charcoal palette, sharp edges).
+- [x] **[NEW]** Rewrote `/admin` layout to match the new SYS_ADMIN aesthetic.
 - [x] **Production build passes with zero errors; `npm test` passes.**
 
 ---
 
-## 🚧 In Progress
+## ⏳ In Progress
 *(Move the currently active task here)*
-- [-] Verifying the end-to-end Magic Link login flow on the live deployed Vercel site.
+- [-] User testing participant flow using the Gmail '+' trick and validating the new Leave/Disband Team features.
 
 ---
 
-## 📝 Pending Backlog (To-Do)
-
-### Phase 8: Frontend Polish
-- [ ] Ensure any text mentioning "Password" is removed across the app.
-- [ ] Handle any Vercel environment variable updates (e.g. `NEXT_PUBLIC_SITE_URL` for correct Magic Link redirection in production).
+## 📋 Pending Backlog (To-Do)
 
 ### Phase 2: Database & Auth Setup (Supabase) — USER MUST DO MANUALLY
-- [x] Run the full `files/team_system_schema.sql` in the Supabase SQL editor (Resolved the `admin_list_teams` cache error).
+- [x] Run the full `files/team_system_schema.sql` in the Supabase SQL editor (Pending user action to resolve `admin_list_teams` cache error).
 - [x] Setup the `allowed_emails` table and the `enforce_allowed_emails` trigger.
-- [ ] Create the `project_screenshots` public storage bucket in Supabase dashboard.
-- [ ] Apply RLS policies for the `profiles` table and storage bucket (see `files/security_protocols.md`).
+- [x] Create the `project_screenshots` public storage bucket in Supabase dashboard.
+- [x] Apply RLS policies for the `profiles` table and storage bucket (see `files/security_protocols.md`).
+- [x] **[NEW]** Setup custom SMTP using Google Workspace app password to bypass Supabase rate limits.
+- [x] **[NEW]** Added a 60-second cooldown timer to the magic link login UI.
+- [x] **[NEW]** Corrected database `handle_new_user` trigger to fetch missing `name` and `phone` values from the `allowed_emails` table.
+- [x] **[NEW]** Corrected `delete_user_completely` RPC to also purge users from the `allowed_emails` whitelist on deletion.
+- [x] **[NEW]** Fixed team leadership bug: UI and DB now correctly promote team creator to `leader` ONLY after their first outgoing invitation is accepted.
+- [x] **[NEW]** Added "Leave Team" / "Disband Team" logic to Next.js actions and `TeamOverviewCard.tsx`. Created `leave_team` RPC.
 
 ### Phase 6: Final Polish
 - [ ] Handle loading states and error handling across all forms.
-- [ ] Final UI/UX polish with Tailwind CSS.
+- [ ] Apply the Neo-Brutalist styling to the inner `TeamSection` and `ParticipantsTable` components.
 
 ---
 
 ## 🧠 Context & Quirks
 *(AI: Log any specific architectural decisions, workarounds, or bugs you encounter here so you don't forget them in the next session.)*
+- **Design System Enforcement:** The user explicitly hates generic AI SaaS design (slop). A strict rule exists in `~/.gemini/config/rules/30-web-design-reasons.md`. DO NOT use `rounded-2xl`, soft shadows, purple/blue gradients, Lucide icons, or `Geist`/`Inter` fonts. Default to sharp edges, hard flat shadows (`shadow-[4px_4px_0px_0px_#1c1917]`), flat borders, and `IBM Plex` typography.
 - **Role Assignment:** Remember, users NEVER choose their role. The database trigger handles it based on the hardcoded trigger logic. The admin email is explicitly whitelisted in the auth trigger (`ce25.rushabh.makwana@kccemsr.edu.in`).
 - **Auth Strategy (Phase 8 Change):** No passwords! The app relies entirely on `supabase.auth.signInWithOtp()`. The frontend callback `auth/callback/route.ts` handles the session.
 - **Whitelist Security:** The Google Apps Script bypasses RLS using the Supabase `service_role` key to populate `allowed_emails`. Signups are hard-blocked by a Postgres trigger on `auth.users` before insertion.
 - **Data Fetching:** Use Server Components for initial fetching and Server Actions for mutations.
-- **File Structure:** Uses `src/app` layout (not bare `app`). All components live in `src/app/`.
-- **Supabase SSR:** Uses `@supabase/ssr` with `createServerClient` for server and `createBrowserClient` for client. Cookie handling is done in `src/lib/supabase/server.ts`.
 - **Team writes are RPC-only:** `teams`/`team_members` have no direct INSERT/UPDATE/DELETE RLS policies on purpose. Every write, and every cross-user read, goes through a `SECURITY DEFINER` RPC.
