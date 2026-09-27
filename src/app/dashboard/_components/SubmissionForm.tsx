@@ -64,12 +64,12 @@ export default function SubmissionForm({
 
   if (isLocked) {
     return (
-      <div className="bg-white rounded-2xl border border-amber-200 shadow-sm p-8 text-center space-y-3">
-        <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto">
-          <Lock className="w-6 h-6 text-amber-700" />
+      <div className="bg-amber-100 rounded-none border-2 border-stone-900 p-8 text-center space-y-4 relative">
+        <div className="absolute top-0 left-0 w-2 h-2 bg-stone-900" /><div className="absolute top-0 right-0 w-2 h-2 bg-stone-900" /><div className="absolute bottom-0 left-0 w-2 h-2 bg-stone-900" /><div className="absolute bottom-0 right-0 w-2 h-2 bg-stone-900" /><div className="w-16 h-16 bg-white border-2 border-stone-900 flex items-center justify-center mx-auto shadow-[4px_4px_0px_0px_#1c1917]">
+          <Lock className="w-8 h-8 text-stone-900" />
         </div>
-        <h3 className="text-lg font-bold text-gray-900">Submissions are Locked</h3>
-        <p className="text-sm text-gray-600 max-w-md mx-auto">
+        <h3 className="text-xl font-bold font-mono uppercase text-stone-900 tracking-tight">Submissions are Locked</h3>
+        <p className="text-sm font-medium text-stone-700 max-w-md mx-auto">
           The event organizers have locked project submissions. New submissions and modifications are currently closed.
         </p>
       </div>
@@ -77,13 +77,13 @@ export default function SubmissionForm({
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+    <div className="bg-white rounded-none border-2 border-stone-900 p-8 space-y-6 relative">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-xl font-bold font-mono uppercase text-stone-900">
             {isEditing ? 'Edit Your Project Submission' : 'Submit Your Project'}
           </h3>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <p className="text-sm font-mono font-bold text-stone-500 mt-1 uppercase">
             {isEditing
               ? 'Update your project description, deploy link, or screenshot.'
               : 'Upload your screenshot, add a description and deploy link.'}
@@ -93,7 +93,7 @@ export default function SubmissionForm({
           <button
             type="button"
             onClick={onCancelEdit}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 text-xs font-semibold transition"
+            className="inline-flex items-center gap-1.5 px-4 py-2 border-2 border-stone-900 text-stone-900 bg-stone-200 hover:bg-stone-300 text-xs font-bold font-mono uppercase transition shadow-[2px_2px_0px_0px_#1c1917] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             Cancel
@@ -107,16 +107,16 @@ export default function SubmissionForm({
 
         {/* Screenshot Upload */}
         <div>
-          <label className="block text-sm font-semibold text-gray-800 mb-2">
-            <ImageIcon className="inline w-4 h-4 mr-1.5 text-indigo-600" />
+          <label className="block text-sm font-bold font-mono text-stone-900 uppercase tracking-widest mb-2">
+            <ImageIcon className="inline w-4 h-4 mr-1.5 text-stone-900" />
             Project Screenshot
           </label>
           <div
             onClick={() => fileInputRef.current?.click()}
-            className={`relative border-2 border-dashed rounded-xl cursor-pointer transition ${
+            className={`relative border-2 border-dashed border-stone-900 cursor-pointer transition ${
               previewUrl
-                ? 'border-indigo-300 bg-indigo-50/50'
-                : 'border-gray-300 hover:border-indigo-300 hover:bg-gray-50'
+                ? 'border-stone-900 bg-amber-50'
+                : 'border-stone-400 hover:border-stone-900 hover:bg-stone-50'
             }`}
           >
             {previewUrl ? (
@@ -125,19 +125,19 @@ export default function SubmissionForm({
                 <img
                   src={previewUrl}
                   alt="Preview"
-                  className="w-full max-h-56 object-cover rounded-lg border border-gray-200"
+                  className="w-full max-h-56 object-cover border-2 border-stone-900"
                 />
-                <p className="text-xs text-indigo-600 text-center mt-2 font-medium">✓ Uploaded — click to change screenshot</p>
+                <p className="text-xs font-bold font-mono uppercase text-stone-600 text-center mt-3">✓ Uploaded — click to change screenshot</p>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-10 px-4">
                 {uploading ? (
-                  <div className="animate-spin w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full" />
+                  <div className="animate-spin w-8 h-8 border-4 border-stone-900 border-t-amber-400 rounded-full" />
                 ) : (
                   <>
-                    <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                    <p className="text-sm font-medium text-gray-700">Click to upload screenshot</p>
-                    <p className="text-xs text-gray-500 mt-1">PNG, JPG, WEBP up to 10MB</p>
+                    <Upload className="w-8 h-8 text-stone-900 mb-3" />
+                    <p className="text-sm font-bold font-mono uppercase text-stone-900">Click to upload screenshot</p>
+                    <p className="text-xs font-bold font-mono uppercase text-stone-500 mt-1">PNG, JPG, WEBP up to 10MB</p>
                   </>
                 )}
               </div>
@@ -154,8 +154,8 @@ export default function SubmissionForm({
 
         {/* Description */}
         <div>
-          <label htmlFor="project_description" className="block text-sm font-semibold text-gray-800 mb-1.5">
-            <FileText className="inline w-4 h-4 mr-1.5 text-indigo-600" />
+          <label htmlFor="project_description" className="block text-sm font-bold font-mono text-stone-900 uppercase tracking-widest mb-2">
+            <FileText className="inline w-4 h-4 mr-1.5 text-stone-900" />
             Project Description
           </label>
           <textarea
@@ -165,14 +165,14 @@ export default function SubmissionForm({
             defaultValue={initialDescription}
             rows={4}
             placeholder="Describe what you built, the problem it solves, and the tech stack you used..."
-            className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition resize-none"
+            className="w-full px-4 py-3 bg-stone-100 border-2 border-stone-900 rounded-none text-sm font-mono text-stone-900 placeholder:text-stone-400 focus:outline-none focus:bg-white transition resize-none"
           />
         </div>
 
         {/* Deploy Link */}
         <div>
-          <label htmlFor="deploy_link" className="block text-sm font-semibold text-gray-800 mb-1.5">
-            <LinkIcon className="inline w-4 h-4 mr-1.5 text-indigo-600" />
+          <label htmlFor="deploy_link" className="block text-sm font-bold font-mono text-stone-900 uppercase tracking-widest mb-2">
+            <LinkIcon className="inline w-4 h-4 mr-1.5 text-stone-900" />
             Deploy Link
           </label>
           <input
@@ -182,18 +182,18 @@ export default function SubmissionForm({
             required
             defaultValue={initialDeployLink}
             placeholder="https://your-project.vercel.app"
-            className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
+            className="w-full px-4 py-3 bg-stone-100 border-2 border-stone-900 rounded-none text-sm font-mono text-stone-900 placeholder:text-stone-400 focus:outline-none focus:bg-white transition"
           />
         </div>
 
         {state?.error && (
-          <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+          <p className="text-sm font-bold font-mono uppercase text-red-900 bg-red-100 border-2 border-red-900 px-4 py-3">
             {state.error}
           </p>
         )}
 
         {state?.success && (
-          <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-xl px-4 py-3">
+          <p className="text-sm font-bold font-mono uppercase text-green-900 bg-green-100 border-2 border-green-900 px-4 py-3">
             🎉 Project submitted successfully!
           </p>
         )}
@@ -201,14 +201,15 @@ export default function SubmissionForm({
         <button
           type="submit"
           disabled={pending || uploading || !uploadedUrl}
-          className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition shadow-sm"
+          className="w-full py-3.5 px-4 bg-amber-400 hover:bg-amber-300 disabled:opacity-50 text-stone-900 border-2 border-stone-900 text-sm font-bold font-mono uppercase transition shadow-[4px_4px_0px_0px_#1c1917] active:shadow-none active:translate-y-[4px] active:translate-x-[4px]"
         >
           {pending ? 'Saving submission…' : isEditing ? 'Update Submission' : 'Submit Project'}
         </button>
         {!uploadedUrl && (
-          <p className="text-xs text-center text-gray-400">Please upload a screenshot to enable submission.</p>
+          <p className="text-xs font-bold font-mono uppercase text-stone-500 text-center mt-3">Please upload a screenshot to enable submission.</p>
         )}
       </form>
     </div>
   )
 }
+

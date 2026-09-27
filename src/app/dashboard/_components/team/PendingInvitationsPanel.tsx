@@ -68,7 +68,7 @@ export default function PendingInvitationsPanel({
                     className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2 border-2 border-stone-900 text-stone-900 bg-amber-400 hover:bg-amber-300 disabled:opacity-50 text-xs font-bold font-mono uppercase transition shadow-[2px_2px_0px_0px_#1c1917] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
                   >
                     <Check className="w-3.5 h-3.5" />
-                    Accept
+                    {respondingId === invite.id ? 'Accepting...' : 'Accept'}
                   </button>
                   <button
                     onClick={() => handleDecline(invite.id)}
@@ -76,7 +76,7 @@ export default function PendingInvitationsPanel({
                     className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2 border-2 border-stone-900 text-stone-900 bg-stone-200 hover:bg-stone-300 disabled:opacity-50 text-xs font-bold font-mono uppercase transition shadow-[2px_2px_0px_0px_#1c1917] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
                   >
                     <X className="w-3.5 h-3.5" />
-                    Decline
+                    {respondingId === invite.id ? 'Declining...' : 'Decline'}
                   </button>
                 </div>
               </li>

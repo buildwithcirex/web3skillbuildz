@@ -1,0 +1,48 @@
+function syncAllExistingResponses() {
+  const SUPABASE_URL = 'YOUR_SUPABASE_URL'; // e.g. https://xyz.supabase.co
+  const SUPABASE_SERVICE_KEY = 'YOUR_SUPABASE_SERVICE_ROLE_KEY';
+
+  const form = FormApp.getActiveForm();
+  const responses = form.getResponses();
+
+  for (let i = 0; i < responses.length; i++) {
+    const response = responses[i];
+    const itemResponses = response.getItemResponses();
+
+    let email = response.getRespondentEmail();
+    let name = '';
+    let phone = '';
+
+    // Adjust these based on your actual form questions
+    itemResponses.forEach(item => {
+      const title = item.getItem().getTitle().toLowerCase();
+      const answer = item.getResponse();
+
+      if (title.includes('email') && !email) email = answer;
+      if (title.includes('name')) name = answer;
+      if (title.includes('phone') || title.includes('mobile')) phone = answer;
+    });
+
+    if (email) {
+      const payload = {
+        email: email.trim().toLowerCase(),
+        name: name.trim(),
+        phone: phone.trim()
+      };
+
+      const options = {
+        method: 'post',
+        contentType: 'application/json',
+        headers: {
+          'apikey': SUPABASE_SERVICE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_SERVICE_KEY,
+          'Prefer': 'resolution=ignore-duplicates' // IMPORTANT: Skips already synced rows
+        },
+        payload: JSON.stringify(payload),
+        muteHttpExceptions: true
+      };
+
+      UrlFetchApp.fetch(SUPABASE_URL + '/rest/v1/allowed_emails', options);
+    }
+  }
+}

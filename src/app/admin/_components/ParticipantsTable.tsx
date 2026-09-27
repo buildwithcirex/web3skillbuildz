@@ -75,7 +75,7 @@ export default function ParticipantsTable({ profiles }: { profiles: Profile[] })
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+    <div className="bg-white border-2 border-stone-900 shadow-none overflow-hidden relative">
       {/* Search */}
       <div className="p-4 border-b border-gray-200 bg-white">
         <div className="relative">
@@ -88,7 +88,7 @@ export default function ParticipantsTable({ profiles }: { profiles: Profile[] })
             className="w-full pl-10 pr-10 py-3 text-sm text-gray-900 placeholder:text-gray-500 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
           />
           {query && (
-            <button onClick={() => setQuery('')} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+            <button onClick={() => setQuery('')} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-500 hover:text-gray-600">
               <X className="w-4 h-4" />
             </button>
           )}
@@ -101,34 +101,34 @@ export default function ParticipantsTable({ profiles }: { profiles: Profile[] })
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-gray-50 border-b border-gray-100">
+          <thead className="bg-stone-200 border-b-2 border-stone-900">
             <tr>
-              <th className="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider px-5 py-3">Name</th>
-              <th className="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider px-5 py-3 hidden md:table-cell">Email</th>
-              <th className="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider px-5 py-3 hidden lg:table-cell">Phone</th>
-              <th className="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider px-5 py-3">Role</th>
-              <th className="text-right text-xs font-semibold text-gray-400 uppercase tracking-wider px-5 py-3">Actions</th>
+              <th className="text-left text-xs font-semibold text-stone-500 uppercase tracking-wider px-5 py-3">Name</th>
+              <th className="text-left text-xs font-semibold text-stone-500 uppercase tracking-wider px-5 py-3 hidden md:table-cell">Email</th>
+              <th className="text-left text-xs font-semibold text-stone-500 uppercase tracking-wider px-5 py-3 hidden lg:table-cell">Phone</th>
+              <th className="text-left text-xs font-semibold text-stone-500 uppercase tracking-wider px-5 py-3">Role</th>
+              <th className="text-right text-xs font-semibold text-stone-500 uppercase tracking-wider px-5 py-3">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={5} className="text-center text-sm text-gray-400 py-12">
+                <td colSpan={5} className="text-center text-sm text-stone-500 py-12">
                   No participants found.
                 </td>
               </tr>
             ) : (
               filtered.map(profile => (
-                <tr key={profile.id} className="hover:bg-gray-50/50 transition">
+                <tr key={profile.id} className="hover:bg-amber-50 transition border-b border-stone-200">
                   <td className="px-5 py-4">
-                    <p className="text-sm font-medium text-gray-900">{profile.name}</p>
-                    <p className="text-xs text-gray-400 md:hidden">{profile.email}</p>
+                    <p className="text-sm font-bold font-mono uppercase text-stone-900">{profile.name}</p>
+                    <p className="text-xs font-mono uppercase text-stone-500 md:hidden">{profile.email}</p>
                   </td>
                   <td className="px-5 py-4 hidden md:table-cell">
-                    <p className="text-sm text-gray-600">{profile.email}</p>
+                    <p className="text-sm font-mono text-stone-600">{profile.email}</p>
                   </td>
                   <td className="px-5 py-4 hidden lg:table-cell">
-                    <p className="text-sm text-gray-600">{profile.phone}</p>
+                    <p className="text-sm font-mono text-stone-600">{profile.phone}</p>
                   </td>
                   <td className="px-5 py-4">
                     <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
@@ -146,7 +146,7 @@ export default function ParticipantsTable({ profiles }: { profiles: Profile[] })
                           onClick={() => handlePromote(profile.id)}
                           disabled={loading}
                           title="Promote to Admin"
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-xs font-semibold transition"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 border-2 border-stone-900 text-stone-900 bg-indigo-400 hover:bg-indigo-300 disabled:opacity-50 text-[10px] font-bold font-mono uppercase transition shadow-[2px_2px_0px_0px_#1c1917] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
                         >
                           <ShieldCheck className="w-3.5 h-3.5" />
                           <span>Promote</span>
@@ -155,7 +155,7 @@ export default function ParticipantsTable({ profiles }: { profiles: Profile[] })
                       <button
                         onClick={() => openEdit(profile)}
                         title="Edit Participant"
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-xs font-semibold transition"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 border-2 border-stone-900 text-stone-900 bg-blue-400 hover:bg-blue-300 text-[10px] font-bold font-mono uppercase transition shadow-[2px_2px_0px_0px_#1c1917] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
                       >
                         <Edit className="w-3.5 h-3.5" />
                         <span>Edit</span>
@@ -163,7 +163,7 @@ export default function ParticipantsTable({ profiles }: { profiles: Profile[] })
                       <button
                         onClick={() => { setDeleteTarget(profile); setActionError(null) }}
                         title="Delete Participant"
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 text-xs font-semibold transition"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 border-2 border-stone-900 text-stone-900 bg-red-400 hover:bg-red-300 text-[10px] font-bold font-mono uppercase transition shadow-[2px_2px_0px_0px_#1c1917] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                         <span>Delete</span>
@@ -180,55 +180,55 @@ export default function ParticipantsTable({ profiles }: { profiles: Profile[] })
       {/* Edit Modal */}
       {editTarget && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+          <div className="bg-white border-4 border-stone-900 w-full max-w-md p-6 relative">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="text-lg font-semibold text-gray-900">Edit Participant</h3>
-              <button onClick={() => setEditTarget(null)} className="text-gray-400 hover:text-gray-600">
+              <h3 className="text-lg font-bold font-mono uppercase text-stone-900">Edit Participant</h3>
+              <button onClick={() => setEditTarget(null)} className="text-stone-500 hover:text-gray-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-800 mb-1.5">Full Name</label>
+                <label className="block text-xs font-bold font-mono text-stone-900 uppercase tracking-widest mb-1.5">Full Name</label>
                 <input
                   value={editName}
                   onChange={e => setEditName(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
+                  className="w-full px-4 py-2.5 bg-stone-100 border-2 border-stone-900 rounded-none text-sm font-mono text-stone-900 focus:outline-none focus:bg-white transition"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-800 mb-1.5">Email</label>
+                <label className="block text-xs font-bold font-mono text-stone-900 uppercase tracking-widest mb-1.5">Email</label>
                 <input
                   value={editEmail}
                   onChange={e => setEditEmail(e.target.value)}
                   type="email"
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
+                  className="w-full px-4 py-2.5 bg-stone-100 border-2 border-stone-900 rounded-none text-sm font-mono text-stone-900 focus:outline-none focus:bg-white transition"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-800 mb-1.5">Phone</label>
+                <label className="block text-xs font-bold font-mono text-stone-900 uppercase tracking-widest mb-1.5">Phone</label>
                 <input
                   value={editPhone}
                   onChange={e => setEditPhone(e.target.value)}
                   type="tel"
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
+                  className="w-full px-4 py-2.5 bg-stone-100 border-2 border-stone-900 rounded-none text-sm font-mono text-stone-900 focus:outline-none focus:bg-white transition"
                 />
               </div>
               {actionError && (
-                <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3">{actionError}</p>
+                <p className="text-sm font-bold font-mono uppercase text-red-900 bg-red-100 border-2 border-red-900 px-4 py-3">{actionError}</p>
               )}
             </div>
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() => setEditTarget(null)}
-                className="flex-1 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition"
+                className="flex-1 py-2.5 border-2 border-stone-900 bg-stone-200 hover:bg-stone-300 text-stone-900 text-sm font-bold font-mono uppercase transition shadow-[4px_4px_0px_0px_#1c1917] active:shadow-none active:translate-y-[4px] active:translate-x-[4px]"
               >
                 Cancel
               </button>
               <button
                 onClick={handleUpdate}
                 disabled={loading}
-                className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-lg text-sm font-semibold transition"
+                className="flex-1 py-2.5 border-2 border-stone-900 bg-indigo-400 hover:bg-indigo-300 disabled:opacity-50 text-stone-900 text-sm font-bold font-mono uppercase transition shadow-[4px_4px_0px_0px_#1c1917] active:shadow-none active:translate-y-[4px] active:translate-x-[4px]"
               >
                 {loading ? 'Saving…' : 'Save Changes'}
               </button>
@@ -240,30 +240,30 @@ export default function ParticipantsTable({ profiles }: { profiles: Profile[] })
       {/* Delete Confirmation Modal */}
       {deleteTarget && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+          <div className="bg-white border-4 border-stone-900 w-full max-w-sm p-6 relative">
             <div className="flex flex-col items-center text-center gap-3 mb-5">
-              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                <Trash2 className="w-6 h-6 text-red-600" />
+              <div className="w-12 h-12 bg-red-400 border-2 border-stone-900 flex items-center justify-center">
+                <Trash2 className="w-6 h-6 text-stone-900" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">Delete Participant?</h3>
-              <p className="text-sm text-gray-500">
-                This will permanently delete <span className="font-medium text-gray-900">{deleteTarget.name}</span> and all their data. This cannot be undone.
+              <h3 className="text-lg font-bold font-mono uppercase text-stone-900">Delete Participant?</h3>
+              <p className="text-sm font-medium text-stone-600">
+                This will permanently delete <span className="font-bold text-stone-900">{deleteTarget.name}</span> and all their data. This cannot be undone.
               </p>
             </div>
             {actionError && (
-              <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mb-4">{actionError}</p>
+              <p className="text-sm text-stone-900 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mb-4">{actionError}</p>
             )}
             <div className="flex gap-3">
               <button
                 onClick={() => setDeleteTarget(null)}
-                className="flex-1 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition"
+                className="flex-1 py-2.5 border-2 border-stone-900 bg-stone-200 hover:bg-stone-300 text-stone-900 text-sm font-bold font-mono uppercase transition shadow-[4px_4px_0px_0px_#1c1917] active:shadow-none active:translate-y-[4px] active:translate-x-[4px]"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDelete}
                 disabled={loading}
-                className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white rounded-lg text-sm font-semibold transition"
+                className="flex-1 py-2.5 border-2 border-stone-900 bg-red-500 hover:bg-red-400 disabled:opacity-50 text-stone-900 text-sm font-bold font-mono uppercase transition shadow-[4px_4px_0px_0px_#1c1917] active:shadow-none active:translate-y-[4px] active:translate-x-[4px]"
               >
                 {loading ? 'Deleting…' : 'Delete'}
               </button>
@@ -274,3 +274,4 @@ export default function ParticipantsTable({ profiles }: { profiles: Profile[] })
     </div>
   )
 }
+

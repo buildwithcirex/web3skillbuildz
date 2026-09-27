@@ -29,21 +29,21 @@ export default function PublishScoresToggle({ isPublished }: { isPublished: bool
     <button
       onClick={handleToggle}
       disabled={loading}
-      className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-xs disabled:opacity-50 ${
+      className={`inline-flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold font-mono uppercase transition shadow-[2px_2px_0px_0px_#1c1917] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] disabled:opacity-50 disabled:shadow-none disabled:translate-y-[2px] disabled:translate-x-[2px] border-2 border-stone-900 ${
         isPublished
-          ? 'bg-purple-100 text-purple-800 border border-purple-300 hover:bg-purple-200'
-          : 'bg-indigo-600 text-white hover:bg-indigo-700'
+          ? 'bg-purple-300 text-stone-900 hover:bg-purple-200'
+          : 'bg-indigo-400 text-stone-900 hover:bg-indigo-300'
       }`}
     >
       {isPublished ? (
         <>
-          <EyeOff className="w-3.5 h-3.5 text-purple-700" />
-          <span>{loading ? 'Updating…' : 'Scores Published (Live)'}</span>
+          <EyeOff className="w-4 h-4 text-stone-900" />
+          <span>{loading ? 'Updating...' : 'Scores Published (Live)'}</span>
         </>
       ) : (
         <>
-          <Send className="w-3.5 h-3.5 text-white" />
-          <span>{loading ? 'Publishing…' : 'Publish Scores to Participants'}</span>
+          <Send className="w-4 h-4 text-stone-900" />
+          <span>{loading ? 'Publishing...' : 'Publish Scores to Participants'}</span>
         </>
       )}
     </button>

@@ -87,6 +87,17 @@ export async function removeTeamMember(memberId: string): Promise<ActionResult> 
   return { error: null }
 }
 
+export async function renameTeam(newName: string): Promise<ActionResult> {
+  const { supabase } = await getAuthedClient()
+
+  const { error } = await supabase.rpc('rename_team', { p_new_name: newName })
+  if (error) return { error: toUserMessage(error.message) }
+
+  revalidatePath('/dashboard')
+  return { error: null }
+}
+
+
 // Auto-creates a solo team ("{FirstName}'s Team") the first time a teamless
 // participant tries to submit. A no-op if they're already on a team.
 export async function ensureSoloTeam(): Promise<ActionResult> {
@@ -148,3 +159,4 @@ export async function leaveTeam(): Promise<ActionResult> {
   revalidatePath('/dashboard/submit')
   return { error: null }
 }
+

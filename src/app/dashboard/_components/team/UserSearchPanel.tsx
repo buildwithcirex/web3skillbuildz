@@ -8,13 +8,13 @@ import type { TeamCandidate } from '@/lib/team/types'
 
 function Badge({ tone, children }: { tone: 'green' | 'gray' | 'indigo' | 'amber'; children: React.ReactNode }) {
   const tones: Record<typeof tone, string> = {
-    green: 'text-green-700 bg-green-100',
-    gray: 'text-gray-600 bg-gray-100',
-    indigo: 'text-indigo-700 bg-indigo-50 border border-indigo-200',
-    amber: 'text-amber-700 bg-amber-100',
+    green: 'bg-green-400 text-stone-900 border-2 border-stone-900',
+    gray: 'bg-stone-200 text-stone-900 border-2 border-stone-900',
+    indigo: 'bg-indigo-400 text-stone-900 border-2 border-stone-900',
+    amber: 'bg-amber-400 text-stone-900 border-2 border-stone-900',
   }
   return (
-    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${tones[tone]}`}>
+    <span className={`inline-flex items-center px-3 py-1.5 text-[10px] font-bold font-mono uppercase whitespace-nowrap ${tones[tone]}`}>
       {children}
     </span>
   )

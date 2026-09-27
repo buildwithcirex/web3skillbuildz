@@ -15,6 +15,10 @@ Whenever a new chat session begins, read this file first to understand the curre
 
 ## Completed Tasks
 *(Move items here once fully implemented and tested)*
+- [x] Added global loading states to buttons to prevent double-clicks during async RPC calls.
+- [x] Ported all Admin components (ParticipantsTable, TeamsPanel, TeamScoreModal) to the strict Neo-Brutalist design system.
+- [x] Implemented Team Renaming: Added rename_team RPC, action, and UI.
+- [x] Confirmed Solo Participant submit workflow (team of 1 lock).
 - [x] Initial project documentation and architecture planning curated.
 - [x] Read all `.md` specification files to understand the project scope.
 - [x] Initialize Next.js App Router project with Tailwind CSS.
@@ -39,8 +43,6 @@ Whenever a new chat session begins, read this file first to understand the curre
 
 ## In Progress
 *(Move the currently active task here)*
-- [-] Adding global loading states to buttons to prevent double-clicks during async RPC calls.
-- [-] Porting `ParticipantsTable` and `AdminTeamsList` to the Neo-Brutalist design system.
 
 ---
 
@@ -59,7 +61,7 @@ Whenever a new chat session begins, read this file first to understand the curre
 - [x] Added "Leave Team" / "Disband Team" logic to Next.js actions and `TeamOverviewCard.tsx`. Created `leave_team` RPC.
 
 ### Phase 6: Final Polish
-- [ ] Handle loading states and error handling across all forms.
+- [x] Handle loading states and error handling across all forms.
 - [ ] Apply the Neo-Brutalist styling to the `ParticipantsTable` components (Admin side).
 
 ---
@@ -71,3 +73,8 @@ Whenever a new chat session begins, read this file first to understand the curre
 - **Whitelist Security:** The Google Apps Script bypasses RLS using the Supabase `service_role` key to populate `allowed_emails`. Signups are hard-blocked by a Postgres trigger on `auth.users` before insertion.
 - **Data Fetching:** Use Server Components for initial fetching and Server Actions for mutations.
 - **Team writes are RPC-only:** `teams`/`team_members` have no direct INSERT/UPDATE/DELETE RLS policies on purpose. Every write, and every cross-user read, goes through a `SECURITY DEFINER` RPC.
+
+
+
+
+

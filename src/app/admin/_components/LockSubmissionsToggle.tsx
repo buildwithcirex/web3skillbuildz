@@ -26,21 +26,21 @@ export default function LockSubmissionsToggle({ isLocked }: { isLocked: boolean 
     <button
       onClick={handleToggle}
       disabled={loading}
-      className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition shadow-xs disabled:opacity-50 ${
+      className={`inline-flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold font-mono uppercase transition shadow-[2px_2px_0px_0px_#1c1917] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] disabled:opacity-50 disabled:shadow-none disabled:translate-y-[2px] disabled:translate-x-[2px] border-2 border-stone-900 ${
         isLocked
-          ? 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100'
-          : 'bg-green-50 text-green-700 border border-green-200 hover:bg-green-100'
+          ? 'bg-red-400 text-stone-900 hover:bg-red-300'
+          : 'bg-green-400 text-stone-900 hover:bg-green-300'
       }`}
     >
       {isLocked ? (
         <>
-          <Lock className="w-4 h-4 text-red-600" />
-          <span>{loading ? 'Updating…' : 'Submissions Locked'}</span>
+          <Lock className="w-4 h-4 text-stone-900" />
+          <span>{loading ? 'Updating...' : 'Submissions Locked'}</span>
         </>
       ) : (
         <>
-          <Unlock className="w-4 h-4 text-green-600" />
-          <span>{loading ? 'Updating…' : 'Submissions Open'}</span>
+          <Unlock className="w-4 h-4 text-stone-900" />
+          <span>{loading ? 'Updating...' : 'Submissions Open'}</span>
         </>
       )}
     </button>

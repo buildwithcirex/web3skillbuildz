@@ -94,7 +94,7 @@ export default function TeamsPanel({ teams }: { teams: AdminTeamSummary[] }) {
                         {team.score}/100
                       </span>
                     ) : (
-                      <span className="text-xs text-gray-400 font-medium">—</span>
+                      <span className="text-xs font-mono uppercase text-stone-500 font-medium">—</span>
                     )}
                   </td>
                   <td className="px-5 py-4">
@@ -133,3 +133,4 @@ export default function TeamsPanel({ teams }: { teams: AdminTeamSummary[] }) {
     </div>
   )
 }
+

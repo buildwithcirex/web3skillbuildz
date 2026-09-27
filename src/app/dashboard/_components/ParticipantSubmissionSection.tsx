@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Rocket, Lock } from 'lucide-react'
+import { Rocket, Lock, ArrowRight } from 'lucide-react'
 import type { Team } from '@/lib/team/types'
 import { ensureSoloTeam } from '@/app/actions/team'
 import SubmissionForm from './SubmissionForm'
@@ -32,26 +32,32 @@ export default function ParticipantSubmissionSection({
     }
 
     return (
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center space-y-3">
-        <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto">
-          <Rocket className="w-6 h-6 text-indigo-700" />
+      <div className="bg-white rounded-none border-2 border-stone-900 p-8 text-center space-y-4 relative">
+        <div className="absolute top-0 left-0 w-2 h-2 bg-stone-900" />
+        <div className="absolute top-0 right-0 w-2 h-2 bg-stone-900" />
+        <div className="absolute bottom-0 left-0 w-2 h-2 bg-stone-900" />
+        <div className="absolute bottom-0 right-0 w-2 h-2 bg-stone-900" />
+        
+        <div className="w-16 h-16 bg-amber-400 border-2 border-stone-900 flex items-center justify-center mx-auto shadow-[4px_4px_0px_0px_#1c1917]">
+          <Rocket className="w-8 h-8 text-stone-900" />
         </div>
-        <h3 className="text-lg font-bold text-gray-900">Ready to submit?</h3>
-        <p className="text-sm text-gray-600 max-w-md mx-auto">
+        <h3 className="text-xl font-bold font-mono uppercase text-stone-900 tracking-tight">Ready to submit?</h3>
+        <p className="text-sm font-medium text-stone-600 max-w-md mx-auto">
           You haven&apos;t created or joined a team yet. Submitting sets you up with your own
           team — you can still invite others to join before you lock it.
         </p>
         {error && (
-          <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3 max-w-md mx-auto">
-            {error}
+          <p className="text-sm font-bold font-mono uppercase text-red-900 bg-red-100 border-2 border-red-900 px-4 py-3 max-w-md mx-auto">
+            ERR: {error}
           </p>
         )}
         <button
           onClick={handleGetStarted}
           disabled={creating}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-bold rounded-xl transition shadow-sm"
+          className="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-amber-400 hover:bg-amber-300 disabled:opacity-50 text-stone-900 border-2 border-stone-900 text-sm font-bold font-mono uppercase transition shadow-[4px_4px_0px_0px_#1c1917] active:shadow-none active:translate-y-[4px] active:translate-x-[4px]"
         >
-          {creating ? 'Setting up…' : 'Get Started'}
+          {creating ? 'Initializing...' : 'Get Started'}
+          {!creating && <ArrowRight className="w-4 h-4" />}
         </button>
       </div>
     )
@@ -59,15 +65,20 @@ export default function ParticipantSubmissionSection({
 
   if (!team.isLocked) {
     return (
-      <div className="bg-white rounded-2xl border border-amber-200 shadow-sm p-8 text-center space-y-3">
-        <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto">
-          <Lock className="w-6 h-6 text-amber-700" />
+      <div className="bg-amber-100 rounded-none border-2 border-stone-900 p-8 text-center space-y-4 relative">
+        <div className="absolute top-0 left-0 w-2 h-2 bg-stone-900" />
+        <div className="absolute top-0 right-0 w-2 h-2 bg-stone-900" />
+        <div className="absolute bottom-0 left-0 w-2 h-2 bg-stone-900" />
+        <div className="absolute bottom-0 right-0 w-2 h-2 bg-stone-900" />
+        
+        <div className="w-16 h-16 bg-white border-2 border-stone-900 flex items-center justify-center mx-auto shadow-[4px_4px_0px_0px_#1c1917]">
+          <Lock className="w-8 h-8 text-stone-900" />
         </div>
-        <h3 className="text-lg font-bold text-gray-900">Finalize your team to unlock submission</h3>
-        <p className="text-sm text-gray-600 max-w-md mx-auto">
+        <h3 className="text-xl font-bold font-mono uppercase text-stone-900 tracking-tight">Lock Required</h3>
+        <p className="text-sm font-medium text-stone-700 max-w-md mx-auto">
           Your team needs to be locked before you can submit a project. Locking freezes your
           team&apos;s membership, so make sure everyone&apos;s in before you do. Head back to your
-          dashboard to lock your team.
+          dashboard home to lock your team.
         </p>
       </div>
     )

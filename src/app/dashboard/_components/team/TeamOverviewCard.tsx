@@ -1,8 +1,7 @@
 'use client'
-
 import { useState } from 'react'
-import { Crown, Trash2, Users, Lock, Unlock, LogOut } from 'lucide-react'
-import { removeTeamMember, lockTeam, leaveTeam } from '@/app/actions/team'
+import { Crown, Trash2, Users, Lock, Unlock, LogOut, Edit2 } from 'lucide-react'
+import { removeTeamMember, lockTeam, leaveTeam, renameTeam } from '@/app/actions/team'
 import type { Team, TeamMember } from '@/lib/team/types'
 
 export default function TeamOverviewCard({ team, currentUserId }: { team: Team; currentUserId: string }) {
@@ -13,6 +12,11 @@ export default function TeamOverviewCard({ team, currentUserId }: { team: Team; 
   const [lockError, setLockError] = useState<string | null>(null)
   const [leaving, setLeaving] = useState(false)
   const [leaveError, setLeaveError] = useState<string | null>(null)
+
+  const [isRenaming, setIsRenaming] = useState(false)
+  const [newName, setNewName] = useState('')
+  const [renaming, setRenaming] = useState(false)
+  const [renameError, setRenameError] = useState<string | null>(null)
 
   const handleRemove = async () => {
     if (!removeTarget) return
@@ -49,6 +53,19 @@ export default function TeamOverviewCard({ team, currentUserId }: { team: Team; 
     if (result?.error) setLockError(result.error)
   }
 
+  const handleRename = async () => {
+    if (!newName.trim()) return
+    setRenaming(true)
+    setRenameError(null)
+    const result = await renameTeam(newName.trim())
+    setRenaming(false)
+    if (result?.error) {
+      setRenameError(result.error)
+    } else {
+      setIsRenaming(false)
+    }
+  }
+
   return (
     <div className="bg-white rounded-none border-2 border-stone-900 p-6 space-y-4 relative">
       {/* Decorative corners */}
@@ -62,8 +79,22 @@ export default function TeamOverviewCard({ team, currentUserId }: { team: Team; 
           <div className="w-10 h-10 bg-amber-400 border-2 border-stone-900 flex items-center justify-center">
             <Users className="w-5 h-5 text-stone-900" />
           </div>
-          <div>
-            <h3 className="text-sm font-bold font-mono text-stone-900 uppercase">{team.name}</h3>
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-bold font-mono text-stone-900 uppercase">{team.name}</h3>
+              {team.isLeader && !team.isLocked && (
+                <button
+                  onClick={() => {
+                    setNewName(team.name)
+                    setIsRenaming(true)
+                  }}
+                  className="p-1 hover:bg-stone-200 text-stone-600 transition border border-transparent hover:border-stone-900"
+                  title="Rename Team"
+                >
+                  <Edit2 className="w-3 h-3" />
+                </button>
+              )}
+            </div>
             <p className="text-xs font-mono font-bold text-stone-500 uppercase tracking-widest">Your Team</p>
           </div>
         </div>
@@ -196,6 +227,59 @@ export default function TeamOverviewCard({ team, currentUserId }: { team: Team; 
           </div>
         </div>
       )}
+      {isRenaming && (
+        <div className="fixed inset-0 bg-stone-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white border-4 border-stone-900 w-full max-w-sm p-6 relative">
+            <div className="absolute top-0 left-0 w-2 h-2 bg-stone-900" />
+            <div className="absolute top-0 right-0 w-2 h-2 bg-stone-900" />
+            <div className="absolute bottom-0 left-0 w-2 h-2 bg-stone-900" />
+            <div className="absolute bottom-0 right-0 w-2 h-2 bg-stone-900" />
+            
+            <div className="flex flex-col items-center text-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-amber-400 border-2 border-stone-900 flex items-center justify-center">
+                <Edit2 className="w-6 h-6 text-stone-900" />
+              </div>
+              <h3 className="text-lg font-bold font-mono uppercase text-stone-900">Rename Team</h3>
+              
+              <div className="w-full text-left mt-2">
+                <label className="text-xs font-bold font-mono text-stone-900 uppercase tracking-widest mb-2 block">
+                  New Team Name
+                </label>
+                <input
+                  type="text"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  className="w-full bg-stone-100 border-2 border-stone-900 px-4 py-2 text-sm font-mono text-stone-900 focus:outline-none focus:bg-white transition"
+                  autoFocus
+                />
+              </div>
+            </div>
+            {renameError && (
+              <p className="text-sm font-bold font-mono uppercase text-red-900 bg-red-100 border-2 border-red-900 px-3 py-2 mb-4">
+                ERR: {renameError}
+              </p>
+            )}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => setIsRenaming(false)}
+                className="flex-1 py-2.5 border-2 border-stone-900 bg-stone-200 hover:bg-stone-300 text-stone-900 text-sm font-bold font-mono uppercase transition shadow-[4px_4px_0px_0px_#1c1917] active:shadow-none active:translate-y-[4px] active:translate-x-[4px]"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleRename}
+                disabled={renaming || !newName.trim()}
+                className="flex-1 py-2.5 border-2 border-stone-900 bg-amber-400 hover:bg-amber-300 disabled:opacity-50 text-stone-900 text-sm font-bold font-mono uppercase transition shadow-[4px_4px_0px_0px_#1c1917] active:shadow-none active:translate-y-[4px] active:translate-x-[4px]"
+              >
+                {renaming ? 'Saving...' : 'Rename'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
+
+
+

@@ -55,7 +55,7 @@ export default function TeamScoreModal({ team, onClose }: TeamScoreModalProps) {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-100 pb-4">
           <div>
-            <h3 className="text-xl font-bold text-gray-900">Review & Score Team</h3>
+            <h3 className="text-xl font-bold font-mono uppercase text-stone-900 tracking-tight">Review & Score Team</h3>
             <p className="text-xs text-gray-500 mt-0.5">
               Team: <span className="font-semibold text-gray-800">{team.name}</span>
               {' · '}
@@ -76,7 +76,7 @@ export default function TeamScoreModal({ team, onClose }: TeamScoreModalProps) {
             {/* Screenshot */}
             {team.screenshotUrl ? (
               <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Screenshot</p>
+                <p className="text-xs font-bold font-mono text-stone-900 uppercase tracking-widest mb-2">Screenshot</p>
                 <div className="rounded-xl overflow-hidden border border-gray-200 bg-gray-50 max-h-72 flex items-center justify-center">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -106,7 +106,7 @@ export default function TeamScoreModal({ team, onClose }: TeamScoreModalProps) {
                   href={team.deployLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-800 hover:underline"
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 font-bold hover:underline"
                 >
                   {team.deployLink}
                   <ExternalLink className="w-4 h-4" />
@@ -163,7 +163,7 @@ export default function TeamScoreModal({ team, onClose }: TeamScoreModalProps) {
           </div>
 
           {error && (
-            <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+            <p className="text-sm font-bold font-mono uppercase text-red-900 bg-red-100 border-2 border-red-900 px-4 py-3">
               {error}
             </p>
           )}
@@ -195,3 +195,4 @@ export default function TeamScoreModal({ team, onClose }: TeamScoreModalProps) {
     </div>
   )
 }
+
