@@ -51,7 +51,7 @@ Whenever a new chat session begins, read this file first to understand the curre
 
 ### USER ACTION REQUIRED
 - [x] **Rename env var:** In `.env.local` AND in Vercel dashboard environment variables, renamed `NEXT_PUBLIC_ADMIN_EMAIL` → `ADMIN_EMAIL`. ✅ Done.
-- [ ] **Run `rename_team` SQL:** Execute `files/rename_team.sql` in the Supabase SQL editor to enable the team renaming RPC on the backend.
+- [x] **Run `rename_team` SQL:** Executed `files/rename_team.sql` in the Supabase SQL editor. ✅ Done.
 
 ### Phase 2: Database & Auth Setup (Supabase) — USER MUST DO MANUALLY
 - [x] Run the full `files/team_system_schema.sql` in the Supabase SQL editor.
