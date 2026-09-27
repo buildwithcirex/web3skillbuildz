@@ -36,6 +36,7 @@ export default function UserSearchPanel() {
   }, [])
 
   const runSearch = useCallback(async (q: string) => {
+    if (!q.trim()) { setResults([]); setLoading(false); return }
     setLoading(true)
     setError(null)
     const result = await searchTeamCandidates(q)
@@ -46,6 +47,7 @@ export default function UserSearchPanel() {
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
+    if (!query.trim()) { setResults([]); return }
     debounceRef.current = setTimeout(() => {
       void runSearch(query)
     }, 300)
@@ -60,14 +62,14 @@ export default function UserSearchPanel() {
     const result = await sendTeamInvitation(candidate.id)
     setSendingId(null)
 
-    // Best-effort local cooldown for the countdown UI — the server remains
-    // the authority and will reject a premature retry with a clear error.
-    setCooldownUntil(prev => ({ ...prev, [candidate.id]: Date.now() + INVITE_COOLDOWN_SECONDS * 1000 }))
-
     if (result?.error) {
       setError(result.error)
       return
     }
+
+    // Best-effort local cooldown for the countdown UI — the server remains
+    // the authority and will reject a premature retry with a clear error.
+    setCooldownUntil(prev => ({ ...prev, [candidate.id]: Date.now() + INVITE_COOLDOWN_SECONDS * 1000 }))
     setResults(prev => prev.map(c => (c.id === candidate.id ? { ...c, status: 'request_sent' } : c)))
   }
 

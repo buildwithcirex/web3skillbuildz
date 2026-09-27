@@ -141,13 +141,14 @@ export async function leaveTeam(): Promise<ActionResult> {
   const { data: teamData } = await supabase.rpc('get_my_team')
   if (teamData?.isLeader && teamData.screenshotUrl) {
     try {
-      const parts = teamData.screenshotUrl.split('/project_screenshots/')
-      if (parts.length > 1) {
-        const filePath = decodeURIComponent(parts[1])
+      const url = new URL(teamData.screenshotUrl)
+      const pathParts = url.pathname.split('/project_screenshots/')
+      if (pathParts.length > 1) {
+        const filePath = decodeURIComponent(pathParts[1])
         await supabase.storage.from('project_screenshots').remove([filePath])
       }
-    } catch (err) {
-      console.error('Error removing screenshot during leaveTeam:', err)
+    } catch {
+      // ignore storage deletion errors — proceed with team leave
     }
   }
 

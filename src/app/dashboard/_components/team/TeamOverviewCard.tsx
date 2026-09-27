@@ -86,6 +86,7 @@ export default function TeamOverviewCard({ team, currentUserId }: { team: Team; 
                 <button
                   onClick={() => {
                     setNewName(team.name)
+                    setRenameError(null)
                     setIsRenaming(true)
                   }}
                   className="p-1 hover:bg-stone-200 text-stone-600 transition border border-transparent hover:border-stone-900"
@@ -251,6 +252,8 @@ export default function TeamOverviewCard({ team, currentUserId }: { team: Team; 
                   onChange={(e) => setNewName(e.target.value)}
                   className="w-full bg-stone-100 border-2 border-stone-900 px-4 py-2 text-sm font-mono text-stone-900 focus:outline-none focus:bg-white transition"
                   autoFocus
+                  maxLength={60}
+                  onKeyDown={(e) => { if (e.key === 'Enter' && newName.trim()) handleRename() }}
                 />
               </div>
             </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useRef, useState } from 'react'
+import { useActionState, useEffect, useRef, useState } from 'react'
 import { submitProject } from '@/app/actions/project'
 import { createClient } from '@/lib/supabase/client'
 import { Upload, Link as LinkIcon, FileText, ImageIcon, Lock, ArrowLeft } from 'lucide-react'
@@ -28,19 +28,45 @@ export default function SubmissionForm({
   const [uploading, setUploading] = useState(false)
   const [uploadedUrl, setUploadedUrl] = useState(initialScreenshotUrl)
   const [previewUrl, setPreviewUrl] = useState(initialScreenshotUrl)
+  const [uploadError, setUploadError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // BUG-20: Revoke blob URLs to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (previewUrl && previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(previewUrl)
+      }
+    }
+  }, [previewUrl])
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
+    // BUG-22: Use inline error UI instead of alert()
     if (!file.type.startsWith('image/')) {
-      alert('Please select an image file.')
+      setUploadError('Please select an image file.')
       return
     }
 
+    // BUG-23: Enforce 10MB file size limit
+    if (file.size > 10 * 1024 * 1024) {
+      setUploadError('File must be under 10MB')
+      return
+    }
+
+    setUploadError(null)
     setUploading(true)
     const supabase = createClient()
+
+    // BUG-19: Delete the previously uploaded file before uploading a new one
+    if (uploadedUrl) {
+      const oldPath = uploadedUrl.split('/project_screenshots/')[1]
+      if (oldPath) {
+        await supabase.storage.from('project_screenshots').remove([oldPath])
+      }
+    }
 
     const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`
     const { data, error } = await supabase.storage
@@ -59,6 +85,7 @@ export default function SubmissionForm({
 
     setUploadedUrl(urlData.publicUrl)
     setPreviewUrl(URL.createObjectURL(file))
+    setUploadError(null)
     setUploading(false)
   }
 
@@ -150,6 +177,11 @@ export default function SubmissionForm({
             onChange={handleFileChange}
             className="hidden"
           />
+          {uploadError && (
+            <p className="text-sm font-bold font-mono uppercase text-red-900 bg-red-100 border-2 border-red-900 px-4 py-3 mt-2">
+              {uploadError}
+            </p>
+          )}
         </div>
 
         {/* Description */}

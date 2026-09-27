@@ -8,8 +8,8 @@ import { redirect } from 'next/navigation'
 async function checkIsAdmin(supabase: Awaited<ReturnType<typeof createClient>>, user: { id: string; email?: string }) {
   if (
     user.email &&
-    process.env.NEXT_PUBLIC_ADMIN_EMAIL &&
-    user.email.toLowerCase() === process.env.NEXT_PUBLIC_ADMIN_EMAIL.toLowerCase()
+    process.env.ADMIN_EMAIL &&
+    user.email.toLowerCase() === process.env.ADMIN_EMAIL.toLowerCase()
   ) {
     return true
   }
@@ -45,9 +45,9 @@ export async function submitProject(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/')
 
-  const description = formData.get('project_description') as string
-  const deployLink = formData.get('deploy_link') as string
-  const screenshotUrl = formData.get('screenshot_url') as string
+  const description = (formData.get('project_description') ?? '') as string
+  const deployLink = (formData.get('deploy_link') ?? '') as string
+  const screenshotUrl = (formData.get('screenshot_url') ?? '') as string
 
   if (!description || !deployLink || !screenshotUrl) {
     return { error: 'All fields including screenshot are required.', success: false }
@@ -74,6 +74,25 @@ export async function revertSubmission() {
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/')
+
+  // Delete the existing screenshot from storage before reverting
+  const { data: teamData } = await supabase
+    .from('teams')
+    .select('screenshot_url')
+    .eq('leader_id', user.id)
+    .maybeSingle()
+
+  if (teamData?.screenshot_url) {
+    try {
+      const parts = teamData.screenshot_url.split('/project_screenshots/')
+      if (parts.length > 1) {
+        const filePath = decodeURIComponent(parts[1])
+        await supabase.storage.from('project_screenshots').remove([filePath])
+      }
+    } catch (storageErr) {
+      console.error('Error removing screenshot during revertSubmission:', storageErr)
+    }
+  }
 
   const { error } = await supabase.rpc('revert_team_submission')
 

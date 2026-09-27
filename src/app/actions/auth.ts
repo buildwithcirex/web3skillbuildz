@@ -52,7 +52,7 @@ export async function signInWithMagicLink(
     return { error: 'Email is required.', success: false }
   }
 
-  if (!email.toLowerCase().includes('@kccemsr.edu.in')) {
+  if (!email.toLowerCase().endsWith('@kccemsr.edu.in')) {
     return { error: 'Please use your college email address.', success: false }
   }
 
@@ -100,7 +100,10 @@ export async function signIn(
 
 export async function signOut() {
   const supabase = await createClient()
-  await supabase.auth.signOut()
+  const { error } = await supabase.auth.signOut()
+  if (error) {
+    console.error('signOut error:', error.message)
+  }
   revalidatePath('/', 'layout')
   redirect('/')
 }

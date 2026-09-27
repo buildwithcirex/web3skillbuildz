@@ -71,7 +71,7 @@ export function useTeamNotifications(userId: string) {
     return () => {
       void supabase.removeChannel(channel)
     }
-  }, [userId])
+  }, [userId, router])
 
   const requestPermission = async () => {
     if (typeof window === 'undefined' || !('Notification' in window)) return

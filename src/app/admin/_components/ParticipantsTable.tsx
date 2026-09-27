@@ -24,11 +24,12 @@ export default function ParticipantsTable({ profiles }: { profiles: Profile[] })
       p =>
         p.name.toLowerCase().includes(q) ||
         p.email.toLowerCase().includes(q) ||
-        p.phone.toLowerCase().includes(q)
+        (p.phone ?? '').toLowerCase().includes(q)
     )
   }, [profiles, query])
 
   const openEdit = (p: Profile) => {
+    setDeleteTarget(null)
     setEditTarget(p)
     setEditName(p.name)
     setEditEmail(p.email)
@@ -38,6 +39,10 @@ export default function ParticipantsTable({ profiles }: { profiles: Profile[] })
 
   const handleUpdate = async () => {
     if (!editTarget) return
+    if (!editName.trim() || !editEmail.trim()) {
+      setActionError('Name and email cannot be empty')
+      return
+    }
     setLoading(true)
     setActionError(null)
     const result = await updateParticipant(editTarget.id, {
@@ -68,10 +73,11 @@ export default function ParticipantsTable({ profiles }: { profiles: Profile[] })
 
   const handlePromote = async (userId: string) => {
     if (!confirm('Promote this user to admin? This cannot be undone.')) return
+    setActionError(null)
     setLoading(true)
     const result = await promoteToAdmin(userId)
     setLoading(false)
-    if (result?.error) alert('Error: ' + result.error)
+    if (result?.error) setActionError('Promote failed: ' + result.error)
   }
 
   return (
@@ -161,7 +167,7 @@ export default function ParticipantsTable({ profiles }: { profiles: Profile[] })
                         <span>Edit</span>
                       </button>
                       <button
-                        onClick={() => { setDeleteTarget(profile); setActionError(null) }}
+                        onClick={() => { setEditTarget(null); setDeleteTarget(profile); setActionError(null) }}
                         title="Delete Participant"
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 border-2 border-stone-900 text-stone-900 bg-red-400 hover:bg-red-300 text-[10px] font-bold font-mono uppercase transition shadow-[2px_2px_0px_0px_#1c1917] active:shadow-none active:translate-y-[2px] active:translate-x-[2px]"
                       >

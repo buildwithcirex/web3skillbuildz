@@ -102,7 +102,8 @@ export interface RemoveMemberInput {
 export function canRemoveMember(input: RemoveMemberInput): RuleResult {
   if (!input.isAuthenticated) return { allowed: false, reason: 'UNAUTHORIZED' }
   if (input.callerId === input.memberId) return { allowed: false, reason: 'CANNOT_REMOVE_SELF' }
-  if (!input.callerTeamId || !input.callerIsLeader) return { allowed: false, reason: 'NOT_LEADER' }
+  if (!input.callerTeamId) return { allowed: false, reason: 'NO_TEAM' }
+  if (!input.callerIsLeader) return { allowed: false, reason: 'NOT_LEADER' }
   if (!input.memberTeamId || input.memberTeamId !== input.callerTeamId) {
     return { allowed: false, reason: 'NOT_TEAM_MEMBER' }
   }

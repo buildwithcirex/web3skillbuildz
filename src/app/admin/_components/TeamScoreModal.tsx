@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { X, ExternalLink, Award, MessageSquare, Check } from 'lucide-react'
 import type { AdminTeamSummary } from '@/lib/team/types'
 import { scoreTeam } from '@/app/actions/project'
@@ -18,6 +18,14 @@ export default function TeamScoreModal({ team, onClose }: TeamScoreModalProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [savedSuccess, setSavedSuccess] = useState(false)
+
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
+    }
+  }, [])
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -39,14 +47,12 @@ export default function TeamScoreModal({ team, onClose }: TeamScoreModalProps) {
       setError(result.error)
     } else {
       setSavedSuccess(true)
-      setTimeout(() => {
-        onClose()
-      }, 900)
+      closeTimerRef.current = setTimeout(() => onClose(), 900)
     }
   }
 
   const hasSubmission = Boolean(
-    team.projectDescription || team.deployLink || team.screenshotUrl
+    team.projectDescription && team.deployLink && team.screenshotUrl
   )
 
   return (
