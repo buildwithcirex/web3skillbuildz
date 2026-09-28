@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Crown, Trash2, Users, Lock, Unlock, LogOut, Edit2 } from 'lucide-react'
 import { removeTeamMember, lockTeam, leaveTeam, renameTeam } from '@/app/actions/team'
 import type { Team, TeamMember } from '@/lib/team/types'
+import UserAvatar from '@/app/_components/UserAvatar'
 
 export default function TeamOverviewCard({ team, currentUserId }: { team: Team; currentUserId: string }) {
   const [removeTarget, setRemoveTarget] = useState<TeamMember | null>(null)
@@ -119,9 +120,7 @@ export default function TeamOverviewCard({ team, currentUserId }: { team: Team; 
         {team.members.map(member => (
           <li key={member.id} className="flex flex-col sm:flex-row sm:items-center justify-between py-4 gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-stone-900 border-2 border-stone-900 flex items-center justify-center text-sm font-bold font-mono text-amber-400 uppercase">
-                {member.name.charAt(0).toUpperCase()}
-              </div>
+              <UserAvatar userId={member.id} name={member.name} size={40} />
               <div>
                 <p className="text-sm font-bold font-mono text-stone-900 uppercase flex items-center gap-2 flex-wrap">
                   {member.name}

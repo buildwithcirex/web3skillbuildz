@@ -1,7 +1,9 @@
 import Link from 'next/link'
 import { signOut } from '@/app/actions/auth'
+import UserAvatar from '@/app/_components/UserAvatar'
 
 interface DashboardNavProps {
+  profileId: string
   profileName: string
   activeTab?: 'home' | 'submission' | 'result'
 }
@@ -12,7 +14,7 @@ const TABS: { key: NonNullable<DashboardNavProps['activeTab']>; label: string; h
   { key: 'result', label: 'Results', href: '/dashboard/results' },
 ]
 
-export default function DashboardNav({ profileName, activeTab }: DashboardNavProps) {
+export default function DashboardNav({ profileId, profileName, activeTab }: DashboardNavProps) {
   return (
     <header className="bg-white border-b-4 border-stone-900">
       <div className="max-w-5xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
@@ -44,7 +46,8 @@ export default function DashboardNav({ profileName, activeTab }: DashboardNavPro
         </div>
 
         <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-          <span className="text-sm font-mono text-stone-600 hidden lg:block border-l-2 border-stone-900 pl-4 uppercase">
+          <span className="text-sm font-mono text-stone-600 hidden lg:flex items-center gap-2 border-l-2 border-stone-900 pl-4 uppercase">
+            <UserAvatar userId={profileId} name={profileName} size={28} />
             User :: <span className="font-bold text-stone-900">{profileName}</span>
           </span>
 

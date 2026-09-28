@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import { Search, Edit, Trash2, ShieldCheck, X } from 'lucide-react'
 import type { Profile } from '@/lib/types'
 import { updateParticipant, deleteParticipant, promoteToAdmin } from '@/app/actions/project'
+import UserAvatar from '@/app/_components/UserAvatar'
 
 export default function ParticipantsTable({ profiles }: { profiles: Profile[] }) {
   const [query, setQuery] = useState('')
@@ -127,8 +128,13 @@ export default function ParticipantsTable({ profiles }: { profiles: Profile[] })
               filtered.map(profile => (
                 <tr key={profile.id} className="hover:bg-amber-100 transition border-b-2 border-stone-900 bg-white">
                   <td className="px-5 py-4">
-                    <p className="text-sm font-bold font-mono uppercase text-stone-900">{profile.name}</p>
-                    <p className="text-xs font-mono uppercase text-stone-500 md:hidden">{profile.email}</p>
+                    <div className="flex items-center gap-3">
+                      <UserAvatar userId={profile.id} name={profile.name} size={36} />
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold font-mono uppercase text-stone-900">{profile.name}</p>
+                        <p className="text-xs font-mono uppercase text-stone-500 md:hidden">{profile.email}</p>
+                      </div>
+                    </div>
                   </td>
                   <td className="px-5 py-4 hidden md:table-cell">
                     <p className="text-sm font-mono font-semibold text-stone-700">{profile.email}</p>

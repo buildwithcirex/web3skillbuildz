@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Check, Clock, Mail, X } from 'lucide-react'
 import { acceptTeamInvitation, declineTeamInvitation } from '@/app/actions/team'
 import type { IncomingInvitation, OutgoingInvitation } from '@/lib/team/types'
+import UserAvatar from '@/app/_components/UserAvatar'
 
 export default function PendingInvitationsPanel({
   incoming,
@@ -91,7 +92,10 @@ export default function PendingInvitationsPanel({
           <ul className="divide-y-2 divide-stone-200 border-t-2 border-b-2 border-stone-200">
             {outgoing.map(invite => (
               <li key={invite.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-4">
-                <p className="text-sm font-bold font-mono uppercase text-stone-900">{invite.recipientName}</p>
+                <div className="flex items-center gap-3">
+                  <UserAvatar userId={invite.recipientId} name={invite.recipientName} size={32} />
+                  <p className="text-sm font-bold font-mono uppercase text-stone-900">{invite.recipientName}</p>
+                </div>
                 <span className="inline-flex items-center justify-center sm:justify-start gap-1.5 text-xs font-bold font-mono uppercase text-stone-900 bg-stone-200 border-2 border-stone-900 px-3 py-1.5">
                   <Clock className="w-3.5 h-3.5" /> Pending
                 </span>
