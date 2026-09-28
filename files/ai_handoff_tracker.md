@@ -7,14 +7,29 @@ Whenever a new chat session begins, read this file first to understand the curre
 ---
 
 ## Project Status Overview
-- **Current Phase:** Phase 7 — Bug-Free & Production Ready (Adding manual participants)
-- **Last Updated:** 2026-09-29T00:32:00+05:30
-- **Current Blocker/Notes:** Working on forcefully adding a new participant to Supabase. Needs to bypass or utilize the `allowed_emails` whitelist. No major blockers.
+- **Current Phase:** ✅ FINAL — Project Complete & Production Ready
+- **Last Updated:** 2026-09-29T01:56:00+05:30
+- **Current Blocker/Notes:** No blockers. The project is fully finalized. The only remaining items are manual Supabase SQL executions (see Pending Backlog). The codebase is clean, TypeScript passes with zero errors, and `next build` completes successfully with no warnings.
 
 ---
 
 ## Completed Tasks
 *(Move items here once fully implemented and tested)*
+
+### Final Session (2026-09-29)
+- [x] **Global Footer**: Created `src/app/_components/Footer.tsx` — a Neo-Brutalist floating amber card with a `SYS_DEV_TEAM` badge and contributor names (Rushabh Makwana, Raaj Patkar, Pushpanjali Mukhopadhyay, Yajat Sharma). Names have interactive hover states using `::` separators. Added to `layout.tsx` globally.
+- [x] **Footer Layout Fix**: Wrapped `{children}` in a `flex-1 flex flex-col` div in `layout.tsx` and changed `min-h-screen` to `flex-1` on the login `page.tsx` so the footer correctly pins to the bottom across all pages.
+- [x] **Logo Consistency Fix**: Unified the logo icon across all pages (login, dashboard nav, admin header) to use `bg-stone-900` + `text-amber-400` — matching the SVG favicon (`src/app/icon.svg`). Previously the login page and dashboard nav used the inverted amber/dark variant.
+- [x] **Final Build Verification**: `tsc --noEmit` exits with code 0. `next build` compiles all 8 routes with zero errors and zero warnings.
+
+### Phase 7: Launch Prep (2026-09-28 & 2026-09-29)
+- [x] **Google Apps Script Fix**: Modified Google Forms sync script (syncAllExistingResponses) to include `?on_conflict=email` in the PostgREST URL so merge-duplicates correctly upserts missing name and phone data for old rows instead of failing silently.
+- [x] **Notification UI Feedback**: Overhauled the TeamSection alerts button to provide native browser popups ("Alerts Enabled" / "Alerts Blocked") and transform into a permanent disabled status badge.
+- [x] **Remote UI Merge**: Pulled and verified the new Mascot, UserAvatar, and updated Podium.tsx components from remote origin/main. Resolved stash safely.
+- [x] **Custom Domain Setup**: Documented environment & Supabase URL configuration for the new domain (`web3.singularityhack.in`).
+- [x] **Custom Favicon**: Created a custom Neo-Brutalist SVG favicon (`icon.svg`) matching the internal SYS_ADMIN logo and removed the default Next.js favicon.
+
+### Previous Sessions
 - [x] **Ghost Team Cleanup**: Wrote `fix_leave_team.sql` to overhaul the `leave_team` RPC. Now when a leader leaves, the team row is fully cascade-deleted (wiping members, submissions, and invites), preventing empty ghost teams from cluttering the admin table.
 - [x] **Neo-Brutalized Leaderboard**: Stripped soft SaaS styling from `LeaderboardList.tsx` and `Podium.tsx` and applied strict Neo-Brutalist borders and hard shadows.
 - [x] **Add Participant Admin UI**: Created `admin_add_allowed_email` RPC to bypass RLS, built Server Action, and added `AddParticipantModal` to the admin dashboard.
@@ -46,19 +61,19 @@ Whenever a new chat session begins, read this file first to understand the curre
 ---
 
 ## In Progress
-*(Move the currently active task here)*
+*(Nothing in progress — project is finalized.)*
 
 ---
 
 ## Pending Backlog (To-Do)
 
-### USER ACTION REQUIRED
+### USER ACTION REQUIRED — Supabase SQL (Not Yet Executed)
 - [x] **Rename env var:** In `.env.local` AND in Vercel dashboard environment variables, renamed `NEXT_PUBLIC_ADMIN_EMAIL` → `ADMIN_EMAIL`. ✅ Done.
 - [x] **Run `rename_team` SQL:** Executed `files/rename_team.sql` in the Supabase SQL editor. ✅ Done.
-- [ ] **Run `admin_add_participant.sql`:** Execute this in the Supabase SQL editor to create the `admin_add_allowed_email` RPC.
-- [ ] **Run `fix_leave_team.sql`:** Execute this in the Supabase SQL editor to fix the ghost team bug and cascade delete disbanded teams.
+- [ ] **Run `admin_add_participant.sql`:** Execute this in the Supabase SQL editor to create the `admin_add_allowed_email` RPC. The `AddParticipantModal` UI in the admin panel will not function until this RPC exists in Supabase.
+- [ ] **Run `fix_leave_team.sql`:** Execute this in the Supabase SQL editor to fix the ghost team bug and cascade delete disbanded teams. Until this runs, leaving a team as leader will leave behind ghost team rows.
 
-### Phase 2: Database & Auth Setup (Supabase) — USER MUST DO MANUALLY
+### Phase 2: Database & Auth Setup (Supabase) — DONE
 - [x] Run the full `files/team_system_schema.sql` in the Supabase SQL editor.
 - [x] Setup the `allowed_emails` table and the `enforce_allowed_emails` trigger.
 - [x] Create the `project_screenshots` public storage bucket in Supabase dashboard.
@@ -70,17 +85,9 @@ Whenever a new chat session begins, read this file first to understand the curre
 - [x] Fixed team leadership bug: UI and DB now correctly promote team creator to `leader` ONLY after their first outgoing invitation is accepted.
 - [x] Added "Leave Team" / "Disband Team" logic to Next.js actions and `TeamOverviewCard.tsx`. Created `leave_team` RPC.
 
-### Phase 6: Final Polish
+### Phase 6: Final Polish — DONE
 - [x] Handle loading states and error handling across all forms.
 - [x] Apply the Neo-Brutalist styling to the `ParticipantsTable` components (Admin side).
-
-### Phase 7: Launch Prep (2026-09-28 & 2026-09-29)
-- [x] **Google Apps Script Fix**: Modified Google Forms sync script (syncAllExistingResponses) to include ?on_conflict=email in the PostgREST URL so merge-duplicates correctly upserts missing 
-ame and phone data for old rows instead of failing silently.
-- [x] **Notification UI Feedback**: Overhauled the TeamSection alerts button to provide native browser popups ("Alerts Enabled" / "Alerts Blocked") and transform into a permanent disabled status badge.
-- [x] **Remote UI Merge**: Pulled and verified the new Mascot, UserAvatar, and updated Podium.tsx components from remote origin/main. Resolved stash safely.
-- [x] **Custom Domain Setup**: Documented environment & Supabase URL configuration for the new domain (`web3.singularityhack.in`).
-- [x] **Custom Favicon**: Created a custom Neo-Brutalist SVG favicon (`icon.svg`) matching the internal SYS_ADMIN logo and removed the default Next.js favicon.
 
 ---
 
@@ -131,6 +138,8 @@ ame and phone data for old rows instead of failing silently.
 
 ## Context & Quirks
 - **Design System Enforcement:** The user explicitly hates generic AI SaaS design (slop). A strict rule exists in `~/.gemini/config/rules/30-web-design-reasons.md`. DO NOT use `rounded-2xl`, soft shadows, purple/blue gradients, Lucide icons, or `Geist`/`Inter` fonts. Default to sharp edges, hard flat shadows (`shadow-[4px_4px_0px_0px_#1c1917]`), flat borders, and `IBM Plex` typography.
+- **Logo Standard:** The canonical logo is `bg-stone-900` container + `text-amber-400` code SVG icon, slightly rotated. This matches the favicon (`src/app/icon.svg`). Do NOT use the inverted (amber bg / dark icon) variant anywhere.
+- **Footer:** A global `Footer` component lives at `src/app/_components/Footer.tsx` and is rendered in `layout.tsx`. It shows the `SYS_DEV_TEAM` badge and contributor names. Do not remove or duplicate it.
 - **Role Assignment:** Remember, users NEVER choose their role. The database trigger handles it based on the hardcoded trigger logic. The admin email is explicitly whitelisted in the auth trigger.
 - **Auth Strategy:** No passwords! The app relies entirely on `supabase.auth.signInWithOtp()`. The frontend callback `auth/callback/route.ts` handles the session.
 - **Whitelist Security:** The Google Apps Script bypasses RLS using the Supabase `service_role` key to populate `allowed_emails`. Signups are hard-blocked by a Postgres trigger on `auth.users` before insertion.
@@ -138,5 +147,3 @@ ame and phone data for old rows instead of failing silently.
 - **Team writes are RPC-only:** `teams`/`team_members` have no direct INSERT/UPDATE/DELETE RLS policies on purpose. Every write, and every cross-user read, goes through a `SECURITY DEFINER` RPC.
 - **Admin env var:** Admin role check uses `process.env.ADMIN_EMAIL` (NOT `NEXT_PUBLIC_ADMIN_EMAIL`). The env var must NOT have the `NEXT_PUBLIC_` prefix or it leaks to the client bundle.
 - **SMTP Scalability:** Default Supabase SMTP is restricted to 3 emails/hour. Custom SMTP is configured via Google Workspace, which raises limits to ~2,000/day. For heavy live event traffic (e.g. hundreds of simultaneous logins), institutional SMTPs may still throttle; transactional APIs (Resend/SendGrid) remain the ideal scaling path.
-
-

@@ -20,8 +20,8 @@ export default function DashboardNav({ profileId, profileName, activeTab }: Dash
       <div className="max-w-5xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full md:w-auto justify-center md:justify-start">
           <Link href="/dashboard" className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-amber-400 border-2 border-stone-900 flex items-center justify-center rotate-[-2deg]">
-              <svg className="w-5 h-5 text-stone-900" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+            <div className="w-8 h-8 bg-stone-900 border-2 border-stone-900 flex items-center justify-center rotate-[-2deg]">
+              <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                 <path strokeLinecap="square" strokeLinejoin="miter" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
               </svg>
             </div>

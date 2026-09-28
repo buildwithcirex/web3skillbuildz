@@ -15,6 +15,7 @@ const ibmMono = IBM_Plex_Mono({
 });
 
 import AgentationWrapper from "./_components/AgentationWrapper";
+import Footer from "./_components/Footer";
 
 export const metadata: Metadata = {
   title: "SkillBuildz — Event Registration & Submission Platform",
@@ -28,7 +29,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${ibmSans.variable} ${ibmMono.variable} h-full antialiased font-sans`}
     >
       <body className="min-h-full bg-stone-100 text-stone-900 flex flex-col font-sans selection:bg-amber-600 selection:text-white">
-        {children}
+        <div className="flex-1 flex flex-col">
+          {children}
+        </div>
+        <Footer />
         <AgentationWrapper />
       </body>
     </html>
