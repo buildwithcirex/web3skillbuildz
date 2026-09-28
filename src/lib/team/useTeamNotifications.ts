@@ -36,18 +36,16 @@ function notifyBrowser(message: string) {
 // browser notification per invitation.
 export function useTeamNotifications(userId: string) {
   const router = useRouter()
-  // Whether to show the "enable notifications" prompt. We don't track the
-  // live Notification.permission value in state (reading it only makes
-  // sense as a one-off, gesture-triggered action) — we just hide the
-  // prompt once the user has responded to it.
   const [promptDismissed, setPromptDismissed] = useState(false)
-  // Always false on first render to match the server; updated after mount.
+  const [permissionStatus, setPermissionStatus] = useState<NotificationPermission>('default')
   const [showPrompt, setShowPrompt] = useState(false)
 
   useEffect(() => {
-    const supported = typeof window !== 'undefined' && 'Notification' in window
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setShowPrompt(supported && !promptDismissed && Notification.permission === 'default')
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      setPermissionStatus(Notification.permission)
+      // Only prompt if they haven't made a decision yet
+      setShowPrompt(Notification.permission === 'default' && !promptDismissed)
+    }
   }, [promptDismissed])
 
   useEffect(() => {
@@ -62,7 +60,6 @@ export function useTeamNotifications(userId: string) {
         payload => {
           const row = payload.new as NotificationRow
           notifyBrowser(row.message)
-          // Automatically refresh the Next.js router to grab fresh data (invites, team members)
           router.refresh()
         }
       )
@@ -74,10 +71,25 @@ export function useTeamNotifications(userId: string) {
   }, [userId, router])
 
   const requestPermission = async () => {
-    if (typeof window === 'undefined' || !('Notification' in window)) return
-    await Notification.requestPermission()
-    setPromptDismissed(true)
+    if (typeof window === 'undefined' || !('Notification' in window)) {
+      alert("Your browser doesn't support push notifications.")
+      return
+    }
+
+    try {
+      const permission = await Notification.requestPermission()
+      setPermissionStatus(permission)
+      setPromptDismissed(true)
+
+      if (permission === 'granted') {
+        alert("Alerts Enabled! You will now be notified when someone invites you.")
+      } else if (permission === 'denied') {
+        alert("Alerts Blocked. If you change your mind, click the lock icon in your URL bar to allow notifications.")
+      }
+    } catch (error) {
+      console.error("Error requesting notification permission:", error)
+    }
   }
 
-  return { showPrompt, requestPermission }
+  return { showPrompt, requestPermission, permissionStatus }
 }
