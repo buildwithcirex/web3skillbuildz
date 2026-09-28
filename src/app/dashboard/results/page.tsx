@@ -25,22 +25,22 @@ export default async function ResultsPage() {
   const result = (leaderboard as LeaderboardResponse | null) ?? { published: false, teams: [] }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-stone-100">
       <DashboardNav profileName={profile.name} activeTab="result" />
 
-      <main className="max-w-5xl mx-auto px-6 py-10 space-y-6">
+      <main className="max-w-5xl mx-auto px-6 py-10 space-y-8">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Results</h2>
-          <p className="text-sm text-gray-500 mt-1">See how every team ranked.</p>
+          <h2 className="text-3xl font-bold font-mono uppercase tracking-tighter text-stone-900">Results</h2>
+          <p className="text-sm font-medium font-mono text-stone-600 mt-1 uppercase">See how every team ranked.</p>
         </div>
 
         {!result.published ? (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center space-y-3">
-            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
-              <Trophy className="w-6 h-6 text-gray-400" />
+          <div className="bg-white border-4 border-stone-900 shadow-[8px_8px_0px_0px_#1c1917] p-10 text-center space-y-4">
+            <div className="w-16 h-16 bg-stone-900 flex items-center justify-center mx-auto rotate-[4deg]">
+              <Trophy className="w-8 h-8 text-amber-400" />
             </div>
-            <h3 className="text-lg font-bold text-gray-900">Results aren&apos;t published yet</h3>
-            <p className="text-sm text-gray-600 max-w-md mx-auto">
+            <h3 className="text-xl font-bold font-mono text-stone-900 uppercase">Results aren&apos;t published yet</h3>
+            <p className="text-sm font-bold font-mono text-stone-600 max-w-md mx-auto uppercase">
               The organizers are still reviewing submissions. Check back once results are announced.
             </p>
           </div>
@@ -70,12 +70,12 @@ function ResultsContent({ teams }: { teams: LeaderboardTeam[] }) {
 
   if (scored.length === 0) {
     return (
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center space-y-3">
-        <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
-          <Trophy className="w-6 h-6 text-gray-400" />
+      <div className="bg-white border-4 border-stone-900 shadow-[8px_8px_0px_0px_#1c1917] p-10 text-center space-y-4">
+        <div className="w-16 h-16 bg-stone-900 flex items-center justify-center mx-auto rotate-[4deg]">
+          <Trophy className="w-8 h-8 text-amber-400" />
         </div>
-        <h3 className="text-lg font-bold text-gray-900">No scores yet</h3>
-        <p className="text-sm text-gray-600 max-w-md mx-auto">
+        <h3 className="text-xl font-bold font-mono text-stone-900 uppercase">No scores yet</h3>
+        <p className="text-sm font-bold font-mono text-stone-600 max-w-md mx-auto uppercase">
           Scores have been published, but no team has been scored yet.
         </p>
       </div>

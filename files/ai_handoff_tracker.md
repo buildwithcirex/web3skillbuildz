@@ -15,6 +15,8 @@ Whenever a new chat session begins, read this file first to understand the curre
 
 ## Completed Tasks
 *(Move items here once fully implemented and tested)*
+- [x] **Ghost Team Cleanup**: Wrote `fix_leave_team.sql` to overhaul the `leave_team` RPC. Now when a leader leaves, the team row is fully cascade-deleted (wiping members, submissions, and invites), preventing empty ghost teams from cluttering the admin table.
+- [x] **Neo-Brutalized Leaderboard**: Stripped soft SaaS styling from `LeaderboardList.tsx` and `Podium.tsx` and applied strict Neo-Brutalist borders and hard shadows.
 - [x] **Add Participant Admin UI**: Created `admin_add_allowed_email` RPC to bypass RLS, built Server Action, and added `AddParticipantModal` to the admin dashboard.
 - [x] **Full 36-bug audit & fix pass.** All critical, medium, and minor bugs resolved. TypeScript passes with zero errors. See "Bug Fix Session" section below for full details.
 - [x] Added global loading states to buttons to prevent double-clicks during async RPC calls.
@@ -53,6 +55,8 @@ Whenever a new chat session begins, read this file first to understand the curre
 ### USER ACTION REQUIRED
 - [x] **Rename env var:** In `.env.local` AND in Vercel dashboard environment variables, renamed `NEXT_PUBLIC_ADMIN_EMAIL` → `ADMIN_EMAIL`. ✅ Done.
 - [x] **Run `rename_team` SQL:** Executed `files/rename_team.sql` in the Supabase SQL editor. ✅ Done.
+- [ ] **Run `admin_add_participant.sql`:** Execute this in the Supabase SQL editor to create the `admin_add_allowed_email` RPC.
+- [ ] **Run `fix_leave_team.sql`:** Execute this in the Supabase SQL editor to fix the ghost team bug and cascade delete disbanded teams.
 
 ### Phase 2: Database & Auth Setup (Supabase) — USER MUST DO MANUALLY
 - [x] Run the full `files/team_system_schema.sql` in the Supabase SQL editor.
@@ -125,3 +129,4 @@ Whenever a new chat session begins, read this file first to understand the curre
 - **Data Fetching:** Use Server Components for initial fetching and Server Actions for mutations.
 - **Team writes are RPC-only:** `teams`/`team_members` have no direct INSERT/UPDATE/DELETE RLS policies on purpose. Every write, and every cross-user read, goes through a `SECURITY DEFINER` RPC.
 - **Admin env var:** Admin role check uses `process.env.ADMIN_EMAIL` (NOT `NEXT_PUBLIC_ADMIN_EMAIL`). The env var must NOT have the `NEXT_PUBLIC_` prefix or it leaks to the client bundle.
+- **SMTP Scalability:** Default Supabase SMTP is restricted to 3 emails/hour. Custom SMTP is configured via Google Workspace, which raises limits to ~2,000/day. For heavy live event traffic (e.g. hundreds of simultaneous logins), institutional SMTPs may still throttle; transactional APIs (Resend/SendGrid) remain the ideal scaling path.
