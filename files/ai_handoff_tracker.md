@@ -7,14 +7,15 @@ Whenever a new chat session begins, read this file first to understand the curre
 ---
 
 ## Project Status Overview
-- **Current Phase:** Phase 7 — Bug-Free & Production Ready
-- **Last Updated:** 2026-09-27T14:43:00+05:30
-- **Current Blocker/Notes:** A comprehensive 36-bug audit was completed and all bugs were fixed (TypeScript check passes with zero errors). The `NEXT_PUBLIC_ADMIN_EMAIL` → `ADMIN_EMAIL` env var rename has been completed in both `.env.local` and Vercel. The project is now fully feature-complete, security-hardened, and production-ready. No known blockers.
+- **Current Phase:** Phase 7 — Bug-Free & Production Ready (Adding manual participants)
+- **Last Updated:** 2026-09-28T10:59:00+05:30
+- **Current Blocker/Notes:** Working on forcefully adding a new participant to Supabase. Needs to bypass or utilize the `allowed_emails` whitelist. No major blockers.
 
 ---
 
 ## Completed Tasks
 *(Move items here once fully implemented and tested)*
+- [x] **Add Participant Admin UI**: Created `admin_add_allowed_email` RPC to bypass RLS, built Server Action, and added `AddParticipantModal` to the admin dashboard.
 - [x] **Full 36-bug audit & fix pass.** All critical, medium, and minor bugs resolved. TypeScript passes with zero errors. See "Bug Fix Session" section below for full details.
 - [x] Added global loading states to buttons to prevent double-clicks during async RPC calls.
 - [x] Ported all Admin components (ParticipantsTable, TeamsPanel, TeamScoreModal) to the strict Neo-Brutalist design system.

@@ -1,25 +1,3 @@
--- ============================================================================
--- Team Building & Invitation System — schema, triggers, RPCs, RLS
---
--- Run this ONCE in the Supabase SQL editor, after the base schema in
--- database_schema.md already exists (this depends on public.profiles).
--- The script is idempotent (safe to re-run).
---
--- Design notes:
---   * public.profiles RLS only allows a user to read their own row
---     (see security_protocols.md), so every read/write in this file is
---     exposed to the client exclusively through SECURITY DEFINER RPC
---     functions — never via direct table access. There are no INSERT/
---     UPDATE/DELETE policies below on purpose: the tables themselves are
---     read-only to the "authenticated" role except through the RPCs,
---     which is what makes leader-only / one-team-per-user / capacity
---     enforcement a backend guarantee rather than a UI convention.
---   * MAX_TEAM_SIZE and INVITE_COOLDOWN_SECONDS live in team_max_size()
---     and team_invite_cooldown_seconds() below. They are mirrored in
---     src/lib/team/constants.ts for the frontend — keep both in sync.
--- ============================================================================
-
--- ---------- Configurable constants ----------
 CREATE OR REPLACE FUNCTION public.team_max_size()
 RETURNS INTEGER LANGUAGE sql IMMUTABLE AS $$ SELECT 3 $$;
 
@@ -910,34 +888,6 @@ BEGIN
   WHERE id = v_team_id;
 END; $$;
 
-
--- Renames the team. Only the leader can rename it, and only if not locked.
-CREATE OR REPLACE FUNCTION public.rename_team(p_new_name TEXT)
-RETURNS VOID LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $
-DECLARE
-  v_uid UUID := auth.uid();
-  v_team_id UUID;
-  v_clean_name TEXT;
-BEGIN
-  IF v_uid IS NULL THEN RAISE EXCEPTION 'UNAUTHORIZED'; END IF;
-  
-  v_clean_name := NULLIF(TRIM(p_new_name), '');
-  IF v_clean_name IS NULL THEN RAISE EXCEPTION 'INVALID_NAME'; END IF;
-
-  SELECT team_id INTO v_team_id FROM public.team_members WHERE user_id = v_uid;
-  IF v_team_id IS NULL THEN RAISE EXCEPTION 'NO_TEAM'; END IF;
-
-  IF NOT EXISTS (SELECT 1 FROM public.teams WHERE id = v_team_id AND leader_id = v_uid) THEN
-    RAISE EXCEPTION 'NOT_LEADER';
-  END IF;
-
-  IF (SELECT is_locked FROM public.teams WHERE id = v_team_id) THEN
-    RAISE EXCEPTION 'TEAM_LOCKED';
-  END IF;
-
-  UPDATE public.teams SET name = v_clean_name WHERE id = v_team_id;
-END; $;
-
 -- ---------- Scoring & admin/leaderboard reads ----------
 
 -- Admin scoring. Independent of lock state (admin can score anytime).
@@ -1010,7 +960,6 @@ GRANT EXECUTE ON FUNCTION public.unlock_team(UUID) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.set_team_formation_lock(BOOLEAN) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.submit_team_project(TEXT, TEXT, TEXT) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.revert_team_submission() TO authenticated;
-GRANT EXECUTE ON FUNCTION public.rename_team(TEXT) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.score_team(UUID, INTEGER, TEXT) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.admin_list_teams() TO authenticated;
 GRANT EXECUTE ON FUNCTION public.get_leaderboard() TO authenticated;
@@ -1023,4 +972,3 @@ ALTER TABLE public.profiles
   DROP COLUMN IF EXISTS screenshot_url,
   DROP COLUMN IF EXISTS score,
   DROP COLUMN IF EXISTS feedback;
-

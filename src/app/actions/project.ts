@@ -325,3 +325,39 @@ export async function promoteToAdmin(userId: string) {
   revalidatePath('/admin')
   return { error: null }
 }
+
+export async function addParticipantToWhitelist(
+  prevState: { error: string | null; success: boolean },
+  formData: FormData
+) {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/')
+
+  const isAdmin = await checkIsAdmin(supabase, user)
+  if (!isAdmin) {
+    return { error: 'Unauthorized: Admin access required.', success: false }
+  }
+
+  const email = (formData.get('email') as string) || ''
+  const name = (formData.get('name') as string) || ''
+  const phone = (formData.get('phone') as string) || ''
+
+  if (!email || !name || !phone) {
+    return { error: 'Name, Email, and Phone are required.', success: false }
+  }
+
+  const { error } = await supabase.rpc('admin_add_allowed_email', {
+    p_email: email,
+    p_name: name,
+    p_phone: phone
+  })
+
+  if (error) {
+    return { error: error.message, success: false }
+  }
+
+  revalidatePath('/admin')
+  return { error: null, success: true }
+}

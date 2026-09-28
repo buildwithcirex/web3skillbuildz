@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { signOut } from '@/app/actions/auth'
 import ParticipantsTable from './_components/ParticipantsTable'
 import TeamsPanel from './_components/TeamsPanel'
+import AddParticipantModal from './_components/AddParticipantModal'
 import LockSubmissionsToggle from './_components/LockSubmissionsToggle'
 import PublishScoresToggle from './_components/PublishScoresToggle'
 import TeamFormationLockToggle from './_components/TeamFormationLockToggle'
@@ -147,6 +148,13 @@ export default async function AdminPage() {
 
         {/* Participants (account management) */}
         <div className="border-t-4 border-stone-900 pt-8 mt-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div>
+              <h3 className="text-xl font-bold font-mono text-stone-900 uppercase">Participants</h3>
+              <p className="text-sm font-medium text-stone-600 mt-1">Manage all registered accounts and whitelist entries.</p>
+            </div>
+            <AddParticipantModal />
+          </div>
           <ParticipantsTable profiles={allProfiles} />
         </div>
       </main>
