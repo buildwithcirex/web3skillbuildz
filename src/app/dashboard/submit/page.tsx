@@ -57,7 +57,7 @@ export default async function SubmitPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <DashboardNav profileName={profile.name} activeTab="submission" />
+      <DashboardNav profileId={profile.id} profileName={profile.name} activeTab="submission" />
 
       <main className="max-w-5xl mx-auto px-6 py-10 space-y-6">
         <div>

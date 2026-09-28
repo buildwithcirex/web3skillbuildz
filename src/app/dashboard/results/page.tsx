@@ -14,7 +14,7 @@ export default async function ResultsPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('name, role')
+    .select('id, name, role')
     .eq('id', user.id)
     .maybeSingle()
 
@@ -26,7 +26,7 @@ export default async function ResultsPage() {
 
   return (
     <div className="min-h-screen bg-stone-100">
-      <DashboardNav profileName={profile.name} activeTab="result" />
+      <DashboardNav profileId={profile.id} profileName={profile.name} activeTab="result" />
 
       <main className="max-w-5xl mx-auto px-6 py-10 space-y-8">
         <div>
@@ -65,8 +65,8 @@ function ResultsContent({ teams }: { teams: LeaderboardTeam[] }) {
       rank: 1 + scored.filter(t => (t.score ?? 0) > (team.score ?? 0)).length,
     }))
 
-  const top3 = ranked.filter(entry => entry.rank <= 3)
-  const rest = ranked.filter(entry => entry.rank > 3)
+  // At most three podium spots; extra ties for 3rd still appear in the full list below.
+  const podium = ranked.filter(entry => entry.rank <= 3).slice(0, 3)
 
   if (scored.length === 0) {
     return (
@@ -84,8 +84,8 @@ function ResultsContent({ teams }: { teams: LeaderboardTeam[] }) {
 
   return (
     <>
-      <Podium entries={top3} />
-      <LeaderboardList ranked={rest} unscored={unscored} />
+      <Podium entries={podium} />
+      <LeaderboardList ranked={ranked} podiumTeamIds={podium.map(entry => entry.team.id)} unscored={unscored} />
     </>
   )
 }

@@ -5,6 +5,7 @@ import { Search, UserPlus, X } from 'lucide-react'
 import { searchTeamCandidates, sendTeamInvitation } from '@/app/actions/team'
 import { INVITE_COOLDOWN_SECONDS } from '@/lib/team/constants'
 import type { TeamCandidate } from '@/lib/team/types'
+import UserAvatar from '@/app/_components/UserAvatar'
 
 function Badge({ tone, children }: { tone: 'green' | 'gray' | 'indigo' | 'amber'; children: React.ReactNode }) {
   const tones: Record<typeof tone, string> = {
@@ -121,9 +122,12 @@ export default function UserSearchPanel() {
 
             return (
               <li key={candidate.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-4">
-                <div className="min-w-0">
-                  <p className="text-sm font-bold font-mono uppercase text-stone-900 truncate">{candidate.name}</p>
-                  <p className="text-xs font-mono font-medium text-stone-500 truncate">{candidate.email}</p>
+                <div className="flex items-center gap-3 min-w-0">
+                  <UserAvatar userId={candidate.id} name={candidate.name} size={36} />
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold font-mono uppercase text-stone-900 truncate">{candidate.name}</p>
+                    <p className="text-xs font-mono font-medium text-stone-500 truncate">{candidate.email}</p>
+                  </div>
                 </div>
 
                 {candidate.status === 'already_in_team' ? (

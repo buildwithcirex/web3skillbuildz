@@ -7,6 +7,7 @@ import DashboardNav from './_components/DashboardNav'
 import TeamSection from './_components/team/TeamSection'
 import type { Profile } from '@/lib/types'
 import type { MyInvitations, Team } from '@/lib/team/types'
+import UserAvatar from '@/app/_components/UserAvatar'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -68,7 +69,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-stone-100">
-      <DashboardNav profileName={profile.name} activeTab="home" />
+      <DashboardNav profileId={profile.id} profileName={profile.name} activeTab="home" />
 
       <main className="max-w-5xl mx-auto px-6 py-10 space-y-8">
         {/* Welcome Banner */}
@@ -151,7 +152,10 @@ export default async function DashboardPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <p className="text-xs font-bold font-mono text-stone-500 uppercase mb-1">Name</p>
-              <p className="font-bold text-stone-900">{profile.name}</p>
+              <div className="flex items-center gap-3">
+                <UserAvatar userId={profile.id} name={profile.name} size={48} />
+                <p className="font-bold text-stone-900">{profile.name}</p>
+              </div>
             </div>
             <div>
               <p className="text-xs font-bold font-mono text-stone-500 uppercase mb-1">ID</p>

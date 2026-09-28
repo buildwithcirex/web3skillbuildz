@@ -5,6 +5,7 @@ import { Award, Lock, Unlock, Crown } from 'lucide-react'
 import type { AdminTeamSummary } from '@/lib/team/types'
 import { unlockTeam } from '@/app/actions/project'
 import TeamScoreModal from './TeamScoreModal'
+import UserAvatar from '@/app/_components/UserAvatar'
 
 export default function TeamsPanel({ teams }: { teams: AdminTeamSummary[] }) {
   const [reviewTarget, setReviewTarget] = useState<AdminTeamSummary | null>(null)
@@ -64,6 +65,7 @@ export default function TeamsPanel({ teams }: { teams: AdminTeamSummary[] }) {
                           key={m.id}
                           className="inline-flex items-center gap-1.5 px-2 py-1 bg-stone-200 text-stone-900 border-2 border-stone-900 text-[10px] font-bold font-mono uppercase"
                         >
+                          <UserAvatar userId={m.id} name={m.name} size={20} className="border" />
                           {m.role === 'leader' && <Crown className="w-3.5 h-3.5 text-stone-900" />}
                           {m.name}
                         </span>
