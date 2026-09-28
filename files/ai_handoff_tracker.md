@@ -8,7 +8,7 @@ Whenever a new chat session begins, read this file first to understand the curre
 
 ## Project Status Overview
 - **Current Phase:** Phase 7 — Bug-Free & Production Ready (Adding manual participants)
-- **Last Updated:** 2026-09-28T10:59:00+05:30
+- **Last Updated:** 2026-09-29T00:32:00+05:30
 - **Current Blocker/Notes:** Working on forcefully adding a new participant to Supabase. Needs to bypass or utilize the `allowed_emails` whitelist. No major blockers.
 
 ---
@@ -74,6 +74,14 @@ Whenever a new chat session begins, read this file first to understand the curre
 - [x] Handle loading states and error handling across all forms.
 - [x] Apply the Neo-Brutalist styling to the `ParticipantsTable` components (Admin side).
 
+### Phase 7: Launch Prep (2026-09-28 & 2026-09-29)
+- [x] **Google Apps Script Fix**: Modified Google Forms sync script (syncAllExistingResponses) to include ?on_conflict=email in the PostgREST URL so merge-duplicates correctly upserts missing 
+ame and phone data for old rows instead of failing silently.
+- [x] **Notification UI Feedback**: Overhauled the TeamSection alerts button to provide native browser popups ("Alerts Enabled" / "Alerts Blocked") and transform into a permanent disabled status badge.
+- [x] **Remote UI Merge**: Pulled and verified the new Mascot, UserAvatar, and updated Podium.tsx components from remote origin/main. Resolved stash safely.
+- [x] **Custom Domain Setup**: Documented environment & Supabase URL configuration for the new domain (`web3.singularityhack.in`).
+- [x] **Custom Favicon**: Created a custom Neo-Brutalist SVG favicon (`icon.svg`) matching the internal SYS_ADMIN logo and removed the default Next.js favicon.
+
 ---
 
 ## Bug Fix Session (2026-09-27) — 36 Bugs Fixed
@@ -130,3 +138,5 @@ Whenever a new chat session begins, read this file first to understand the curre
 - **Team writes are RPC-only:** `teams`/`team_members` have no direct INSERT/UPDATE/DELETE RLS policies on purpose. Every write, and every cross-user read, goes through a `SECURITY DEFINER` RPC.
 - **Admin env var:** Admin role check uses `process.env.ADMIN_EMAIL` (NOT `NEXT_PUBLIC_ADMIN_EMAIL`). The env var must NOT have the `NEXT_PUBLIC_` prefix or it leaks to the client bundle.
 - **SMTP Scalability:** Default Supabase SMTP is restricted to 3 emails/hour. Custom SMTP is configured via Google Workspace, which raises limits to ~2,000/day. For heavy live event traffic (e.g. hundreds of simultaneous logins), institutional SMTPs may still throttle; transactional APIs (Resend/SendGrid) remain the ideal scaling path.
+
+
