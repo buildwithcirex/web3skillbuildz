@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Award, Lock, Unlock, Crown } from 'lucide-react'
-import type { AdminTeamSummary } from '@/lib/team/types'
+import { MAX_SCORE, type AdminTeamSummary } from '@/lib/team/types'
 import { unlockTeam } from '@/app/actions/project'
 import TeamScoreModal from './TeamScoreModal'
 import UserAvatar from '@/app/_components/UserAvatar'
@@ -98,7 +98,7 @@ export default function TeamsPanel({ teams }: { teams: AdminTeamSummary[] }) {
                     {team.score !== null && team.score !== undefined ? (
                       <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-400 text-stone-900 border-2 border-stone-900 text-[10px] font-bold font-mono uppercase">
                         <Award className="w-3.5 h-3.5 text-stone-900" />
-                        {team.score}/100
+                        {team.score}/{MAX_SCORE}
                       </span>
                     ) : (
                       <span className="text-xs font-mono uppercase text-stone-500 font-bold">—</span>

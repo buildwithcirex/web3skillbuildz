@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import type { LeaderboardTeam } from '@/lib/team/types'
+import { MAX_SCORE, type LeaderboardTeam } from '@/lib/team/types'
 import Mascot, { SLOT_MASCOTS } from './Mascot'
 import { PODIUM_REVEAL_SECONDS } from './Podium'
 import UserAvatar from '@/app/_components/UserAvatar'
@@ -77,7 +77,7 @@ export default function LeaderboardList({
                     </div>
                   </td>
                   <td className="px-5 py-4 text-right">
-                    <span className="text-sm font-bold font-mono text-stone-900">{team.score}/100</span>
+                    <span className="text-sm font-bold font-mono text-stone-900">{team.score}/{MAX_SCORE}</span>
                   </td>
                 </tr>
                 )
