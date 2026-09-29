@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import type { LeaderboardTeam } from '@/lib/team/types'
+import { MAX_SCORE, type LeaderboardTeam } from '@/lib/team/types'
 import Mascot, { SLOT_MASCOTS } from './Mascot'
 
 interface PodiumEntry {
@@ -143,7 +143,7 @@ export default function Podium({ entries }: { entries: PodiumEntry[] }) {
                     {team.name}
                   </p>
                   <p className="text-[10px] sm:text-xs font-bold font-mono text-stone-900 bg-white border-2 border-stone-900 px-1.5 py-0.5">
-                    {team.score}/100
+                    {team.score}/{MAX_SCORE}
                   </p>
                   <p className="hidden sm:block w-full text-[10px] font-bold font-mono uppercase text-stone-800 truncate" title={members}>
                     {members}

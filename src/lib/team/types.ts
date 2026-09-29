@@ -117,6 +117,8 @@ export type TeamErrorCode =
   | 'SUBMISSIONS_LOCKED'
   | 'INVALID_SCORE'
 
+export const MAX_SCORE = 20
+
 export const TEAM_ERROR_MESSAGES: Record<TeamErrorCode, string> = {
   UNAUTHORIZED: 'You are not authorized to perform this action.',
   ALREADY_IN_TEAM: 'You are already part of a team.',
@@ -135,7 +137,7 @@ export const TEAM_ERROR_MESSAGES: Record<TeamErrorCode, string> = {
   TEAM_LOCKED: 'Your team is locked, so membership can no longer change.',
   TEAM_NOT_LOCKED: 'Your team must be locked before you can submit.',
   SUBMISSIONS_LOCKED: 'Submissions have been locked by the event organizer.',
-  INVALID_SCORE: 'Score must be a number between 0 and 100.',
+  INVALID_SCORE: `Score must be a whole number between 0 and ${MAX_SCORE}.`,
 }
 
 export const DEFAULT_TEAM_ERROR_MESSAGE =

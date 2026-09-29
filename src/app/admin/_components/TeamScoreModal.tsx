@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { X, ExternalLink, Award, MessageSquare, Check } from 'lucide-react'
-import type { AdminTeamSummary } from '@/lib/team/types'
+import { MAX_SCORE, type AdminTeamSummary } from '@/lib/team/types'
 import { scoreTeam } from '@/app/actions/project'
 
 interface TeamScoreModalProps {
@@ -34,8 +34,8 @@ export default function TeamScoreModal({ team, onClose }: TeamScoreModalProps) {
     setSavedSuccess(false)
 
     const numScore = score === '' ? null : Number(score)
-    if (numScore !== null && (isNaN(numScore) || numScore < 0 || numScore > 100)) {
-      setError('Score must be a number between 0 and 100.')
+    if (numScore !== null && (!Number.isInteger(numScore) || numScore < 0 || numScore > MAX_SCORE)) {
+      setError(`Score must be a whole number between 0 and ${MAX_SCORE}.`)
       setLoading(false)
       return
     }
@@ -137,17 +137,17 @@ export default function TeamScoreModal({ team, onClose }: TeamScoreModalProps) {
             <div className="sm:col-span-1">
               <label htmlFor="modal_score" className="block text-sm font-semibold text-gray-800 mb-1.5">
                 <Award className="inline w-4 h-4 mr-1 text-amber-600" />
-                Score (0 - 100)
+                Score (0 - {MAX_SCORE})
               </label>
               <input
                 id="modal_score"
                 type="number"
                 min="0"
-                max="100"
+                max={MAX_SCORE}
                 step="1"
                 value={score}
                 onChange={e => setScore(e.target.value)}
-                placeholder="e.g. 85"
+                placeholder="e.g. 17"
                 className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
               />
             </div>

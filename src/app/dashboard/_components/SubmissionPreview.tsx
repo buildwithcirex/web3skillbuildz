@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import type { Team } from '@/lib/team/types'
+import { MAX_SCORE, type Team } from '@/lib/team/types'
 import { ExternalLink, Edit3, RotateCcw, Lock, Award, MessageSquare } from 'lucide-react'
 import { revertSubmission } from '@/app/actions/project'
 
@@ -80,7 +80,7 @@ export default function SubmissionPreview({
               <h4 className="text-sm font-bold font-mono uppercase text-stone-900">Evaluation Score</h4>
             </div>
             <div className="text-2xl font-black font-mono text-stone-900 bg-white px-3 py-1 rounded-none border-2 border-stone-900">
-              {team.score} <span className="text-xs font-normal text-stone-600">/ 100</span>
+              {team.score} <span className="text-xs font-normal text-stone-600">/ {MAX_SCORE}</span>
             </div>
           </div>
           {team.feedback && (

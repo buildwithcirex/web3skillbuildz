@@ -545,7 +545,7 @@ BEGIN
     SELECT 1 FROM pg_constraint WHERE conname = 'teams_score_range'
   ) THEN
     ALTER TABLE public.teams
-      ADD CONSTRAINT teams_score_range CHECK (score IS NULL OR (score BETWEEN 0 AND 100));
+      ADD CONSTRAINT teams_score_range CHECK (score IS NULL OR (score BETWEEN 0 AND 20));
   END IF;
 END $$;
 
@@ -895,7 +895,7 @@ CREATE OR REPLACE FUNCTION public.score_team(p_team_id UUID, p_score INTEGER, p_
 RETURNS VOID LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 BEGIN
   IF NOT public.is_admin() THEN RAISE EXCEPTION 'UNAUTHORIZED'; END IF;
-  IF p_score IS NOT NULL AND (p_score < 0 OR p_score > 100) THEN RAISE EXCEPTION 'INVALID_SCORE'; END IF;
+  IF p_score IS NOT NULL AND (p_score < 0 OR p_score > 20) THEN RAISE EXCEPTION 'INVALID_SCORE'; END IF;
   UPDATE public.teams
   SET score = p_score, feedback = NULLIF(TRIM(COALESCE(p_feedback, '')), '')
   WHERE id = p_team_id;

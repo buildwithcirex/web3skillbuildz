@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { MAX_SCORE, TEAM_ERROR_MESSAGES } from '@/lib/team/types'
 
 // Helper to check admin status reliably
 async function checkIsAdmin(supabase: Awaited<ReturnType<typeof createClient>>, user: { id: string; email?: string }) {
@@ -207,6 +208,10 @@ export async function scoreTeam(
   const isAdmin = await checkIsAdmin(supabase, user)
   if (!isAdmin) {
     return { error: 'Unauthorized: Admin access required.' }
+  }
+
+  if (score !== null && (!Number.isInteger(score) || score < 0 || score > MAX_SCORE)) {
+    return { error: TEAM_ERROR_MESSAGES.INVALID_SCORE }
   }
 
   const { error } = await supabase.rpc('score_team', {
