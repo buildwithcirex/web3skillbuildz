@@ -7,13 +7,8 @@ export async function GET(request: NextRequest) {
   const token_hash = searchParams.get('token_hash')
   const type = searchParams.get('type')
 
-  // Default destination — will be updated after we know the user's role
-  const redirectTo = new URL('/', request.url)
-  const response = NextResponse.redirect(redirectTo)
+  const response = NextResponse.redirect(new URL('/', request.url))
 
-  // Create the Supabase client reading from request cookies and writing
-  // directly onto the response object — this is the only way cookies survive
-  // a redirect on Vercel / production serverless environments.
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -31,8 +26,10 @@ export async function GET(request: NextRequest) {
     }
   )
 
+  let user = null
+
   if (token_hash && type) {
-    const { error } = await supabase.auth.verifyOtp({
+    const { data, error } = await supabase.auth.verifyOtp({
       token_hash,
       type: type as 'magiclink' | 'email',
     })
@@ -41,25 +38,27 @@ export async function GET(request: NextRequest) {
       response.headers.set('Location', `/?error=${encodeURIComponent(error.message)}`)
       return response
     }
+    user = data.user
   } else if (code) {
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     if (error) {
       console.error('[auth/callback] exchangeCodeForSession error:', error.message)
       response.headers.set('Location', `/?error=${encodeURIComponent(error.message)}`)
       return response
     }
+    user = data.user
   } else {
-    // No auth params at all — send back to login
     return response
   }
-
-  // Auth succeeded — determine where to send the user
-  const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
     return response
   }
 
+  // Use the service role to read the profile since the session cookie
+  // was just set on the response (not yet on the request).
+  // /dashboard already handles admin → /admin redirect, so this is a
+  // belt-and-suspenders fast path.
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
@@ -70,3 +69,4 @@ export async function GET(request: NextRequest) {
   response.headers.set('Location', new URL(destination, request.url).toString())
   return response
 }
+
